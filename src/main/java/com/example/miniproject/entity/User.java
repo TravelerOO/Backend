@@ -16,14 +16,15 @@ public class User {
 
     @Column(nullable = false)
     private String userId;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String nickname;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String name;
+
+    public User(String userId){
+        this.userId = userId;
+    }
 
 }
