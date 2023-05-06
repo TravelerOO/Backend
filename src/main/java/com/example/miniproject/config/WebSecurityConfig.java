@@ -30,7 +30,10 @@ public class WebSecurityConfig {
             "/user/**",
             "/member/authenticate",
             "/auth/**",
-            "/oauth2/authorization/**"
+            "/oauth2/authorization/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/board/list"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
@@ -59,7 +62,7 @@ public class WebSecurityConfig {
                         .anyRequest()
                         .authenticated())
                 // JWT 인증/인가를 사용하기 위한 설정
-                .addFilterAfter(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
                 .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
                 .successHandler(oAuth2AuthenticationSuccessHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행

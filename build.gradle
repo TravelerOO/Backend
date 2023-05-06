@@ -48,6 +48,12 @@ dependencies {
 
 	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
 
+	// spring-doc for local test(swagger-ui)
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version:'1.6.9'
+
+	// S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 
 }
 

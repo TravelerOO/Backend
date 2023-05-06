@@ -49,6 +49,7 @@ public class UserOAuth2Service extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("로드유저 호출");
 
         // 로그인에 성공한 사용자의 기본정보를 가지고 온다.
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -61,7 +62,7 @@ public class UserOAuth2Service extends DefaultOAuth2UserService {
         Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
         String nickname = (String) properties.get("nickname");
         
-        System.out.println("로드유저 호출");
+
 
 
         /*
