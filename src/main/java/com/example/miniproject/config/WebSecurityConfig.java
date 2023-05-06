@@ -2,6 +2,8 @@ package com.example.miniproject.config;
 
 import com.example.miniproject.config.jwt.JwtAuthenticationFilter;
 import com.example.miniproject.config.jwt.JwtUtil;
+import com.example.miniproject.config.oauth.OAuth2AuthenticationSuccessHandler;
+import com.example.miniproject.config.oauth.UserOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -24,11 +26,15 @@ import javax.servlet.Filter;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
 
-    private final JwtUtil jwtUtil;
-
     private static final String[] AUTH_WHITELIST = {
-            "/user/**"
+            "/user/**",
+            "/member/authenticate",
+            "/auth/**",
+            "/oauth2/authorization/**"
     };
+    private final JwtUtil jwtUtil;
+    private final UserOAuth2Service userOAuth2Service;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -53,7 +59,12 @@ public class WebSecurityConfig {
                         .anyRequest()
                         .authenticated())
                 // JWT 인증/인가를 사용하기 위한 설정
-                .addFilterAfter((Filter) new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login()
+                .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
+                .successHandler(oAuth2AuthenticationSuccessHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행
+                .userInfoEndpoint()
+                .userService(userOAuth2Service); // 로그인이 성공하면 해당 유저의 정보를 들고 userOAuth2Service에서 후처리를 해주겠다는의미.
 
         return http.build();
     }
