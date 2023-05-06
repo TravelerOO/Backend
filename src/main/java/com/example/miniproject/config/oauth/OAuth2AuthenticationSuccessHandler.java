@@ -34,7 +34,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String nickname = (String) properties.get("nickname");
 
         // jwt 토큰 발급
-        String jwt = jwtUtil.createToken(nickname);
+        String jwt = jwtUtil.createAccessToken(nickname);
 
         String url = makeRedirectUrl(jwt);
         System.out.println("url: " + url);
@@ -48,6 +48,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     // 로그인 성공후에 redirecturl
     private String makeRedirectUrl(String token) {
+        System.out.println("함수호출");
+
 //        return UriComponentsBuilder.fromUriString("http://localhost:8080/main/"+token)
         return UriComponentsBuilder.fromUriString("http://localhost:8080/user/kakaologin/" + token)
                 .build().toUriString();

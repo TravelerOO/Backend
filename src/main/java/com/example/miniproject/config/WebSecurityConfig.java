@@ -63,6 +63,7 @@ public class WebSecurityConfig {
                         .authenticated())
                 // JWT 인증/인가를 사용하기 위한 설정
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                // 소셜로그인 사용하기
                 .oauth2Login()
                 .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
                 .successHandler(oAuth2AuthenticationSuccessHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행
