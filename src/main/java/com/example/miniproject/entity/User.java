@@ -32,4 +32,8 @@ public class User {
         this.nickname = nickname;
         this.name = name;
     }
+    public User(String userId){
+        this.userId = userId;
+    }
+
 }
