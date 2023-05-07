@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.message.AuthException;
 import java.io.IOException;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class BoardService {
             return ResponseEntity.ok(boardResponseDto);
         }
 
-        return ResponseEntity.badRequest().body(new MsgAndHttpStatusDto("이미지 파일을 업로드해주세요.", HttpStatus.BAD_REQUEST.value()));
+        throw new IllegalArgumentException("이미지 파일을 업로드해주세요");
     }
 
     @Transactional(readOnly = true)
@@ -95,14 +96,15 @@ public class BoardService {
         );
 
         if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
-            return ResponseEntity.badRequest().body(new MsgAndHttpStatusDto("본인이 작성한 글만 삭제 가능합니다.", HttpStatus.FORBIDDEN.value()));
+            throw new IllegalArgumentException("본인이 작성한 글만 삭제할 수 있습니다.");
         }
+
         String imgPath = board.getImage();
         if (s3Uploader.delete(imgPath)) { // S3 에서 이미지 파일 삭제가 성공하면 DB에 있는 게시글도 삭제
             boardRepository.delete(board);
             return ResponseEntity.ok(new MsgAndHttpStatusDto("삭제 완료!", HttpStatus.OK.value()));
         }
 
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("삭제 실패!", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        throw new IllegalArgumentException("삭제에 실패했습니다.");
     }
 }
