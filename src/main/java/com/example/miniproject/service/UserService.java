@@ -31,14 +31,14 @@ public class UserService {
         String password = loginRequestDto.getPassword();
 
         User user = userRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("넌 오류야야야ㅑ"));// 예외처리 해주기
+                () -> new IllegalArgumentException("가입하지 않은 회원입니다."));// 예외처리 해주기
 
         System.out.println(password);
         System.out.println(user.getPassword());
 
-//        if (!passwordEncoder.matches(password,user.getPassword())) {
-//            throw new IllegalStateException("난 오류야야야야");
-//        }
+        if (!passwordEncoder.matches(password,user.getPassword())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
@@ -70,7 +70,7 @@ public class UserService {
         if(userRepository.existsByUserId(userId)){
             throw new IllegalStateException("아이디 중복확인을 해주세요.");
         }
-        User user = new User(userId,passwordEncoder.encode(password),nickname,name);
+        User user = new User(userId,password,nickname,name);
         userRepository.save(user);
     }
 }
