@@ -28,7 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         if (accessToken != null) {
-            String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
 
             if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
                 this.setAuthentication(accessToken);
@@ -37,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 boolean isRefreshToken = jwtUtil.existsRefreshToken(refreshToken);
                 if (validateRefreshToken && isRefreshToken) {
+                    String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
                     /// 토큰 발급
                     String newAccessToken = jwtUtil.createAccessToken(userId);
                     /// 헤더에 어세스 토큰 추가
