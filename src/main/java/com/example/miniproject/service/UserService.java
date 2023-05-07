@@ -37,7 +37,7 @@ public class UserService {
         System.out.println(user.getPassword());
 
         if (!passwordEncoder.matches(password,user.getPassword())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
