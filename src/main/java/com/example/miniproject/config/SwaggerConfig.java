@@ -1,5 +1,6 @@
 package com.example.miniproject.config;
 
+import com.example.miniproject.config.jwt.JwtUtil;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
