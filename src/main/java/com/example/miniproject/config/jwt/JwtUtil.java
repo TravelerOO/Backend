@@ -35,7 +35,7 @@ public class JwtUtil {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final long TOKEN_TIME = 1800000L; // 30분으로 설정
 
-    private static final long REFRESH_TOKEN_TIME = 6 * 1800000L; // 3시간으로 설정
+    private static final long REFRESH_TOKEN_TIME =6*1800000L; // 3시간으로 설정
 
     @Value("${jwt.secret.access-key}")
     private String accessSecretKey;
@@ -136,11 +136,13 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-    public Long getExpiration(Key key, String token) {
+    public Long getExpiration(String accessToken) {
         // accessToken 남은 유효시간
-        Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getExpiration();
+        Date expiration = Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken).getBody().getExpiration();
         // 현재 시간
         Long now = new Date().getTime();
         return (expiration.getTime() - now);
     }
+
+
 }

@@ -5,7 +5,6 @@ import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.entity.User;
-import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,10 +21,9 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RedisService redisService;
 
+    private final RedisService redisService;
 
     @Transactional
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {

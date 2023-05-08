@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
@@ -18,16 +17,21 @@ public class SwaggerConfig {
                 .title("MiniProject(Travel SNS)")
                 .description("Api Description");
 
-        String auth_header = "jwtAuth";
+        String access_token_header = JwtUtil.AUTHORIZATION_HEADER;
+        String refresh_token_header = JwtUtil.REFRESHTOKEN_HEADER;
 
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(auth_header);
+        // 헤더에 security scheme 도 같이 보내게 만드는 것
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(access_token_header).addList(refresh_token_header);
 
         Components components = new Components()
-                .addSecuritySchemes(auth_header, new SecurityScheme()
-                        .name(auth_header)
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT"));
+                .addSecuritySchemes(access_token_header, new SecurityScheme()
+                        .name(access_token_header)
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER))
+                .addSecuritySchemes(refresh_token_header, new SecurityScheme()
+                        .name(refresh_token_header)
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER));
 
         return new OpenAPI()
                 .info(info)
@@ -35,4 +39,3 @@ public class SwaggerConfig {
                 .components(components);
     }
 }
-

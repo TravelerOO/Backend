@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@PropertySource(value = {"classpath:application-aws.properties"})
 public class MiniProjectApplication {
 
 	public static void main(String[] args) {

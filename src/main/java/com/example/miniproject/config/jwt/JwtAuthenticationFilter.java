@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         }
                         try {
                             this.setAuthentication(userId);
-                        } catch (Exception e) {
+                        } catch (UsernameNotFoundException e) {
                             jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
                             return;
                         }
@@ -54,10 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+
     }
 
-
-    public void setAuthentication(String userId) throws UsernameNotFoundException {
+    public void setAuthentication(String userId) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(userId);
         context.setAuthentication(authentication);
@@ -68,7 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         try {
             String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
