@@ -62,10 +62,8 @@ dependencies {
 	// redis 사용
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	//JASYPT 의존성 주입
-//	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
-
-
+	// JASYPT 를 사용한 프로퍼티 암호화
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 }
 
 tasks.named('test') {

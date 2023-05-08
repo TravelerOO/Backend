@@ -3,15 +3,13 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
+import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.entity.User;
-import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +21,6 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final RedisService redisService;
@@ -60,9 +57,10 @@ public class UserService {
             throw new IllegalStateException("이미 사용중인 아이디입니다.");
         }
     }
+
     @Transactional
     public void logout(HttpServletRequest request) {
-        redisService.deleteValues(request.getHeader("RefreshToken"));
+        redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
     }
 
     //회원가입
