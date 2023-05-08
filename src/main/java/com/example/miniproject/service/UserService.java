@@ -4,7 +4,6 @@ import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.UserIdRequestDto;
-import com.example.miniproject.entity.RefreshToken;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
@@ -23,7 +22,6 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final RedisService redisService;
@@ -65,7 +63,7 @@ public class UserService {
 
     @Transactional
     public void logout(HttpServletRequest request) {
-        redisService.deleteValues(request.getHeader("RefreshToken"));
+        redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
     }
 
     //회원가입
