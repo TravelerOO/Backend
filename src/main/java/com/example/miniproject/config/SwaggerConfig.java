@@ -17,13 +17,19 @@ public class SwaggerConfig {
                 .title("MiniProject(Travel SNS)")
                 .description("Api Description");
 
-        String auth_header = "jwtAuth";
+        String access_token_header = "Authorization";
+        String refresh_token_header = "RefreshToken";
 
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(auth_header);
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT AUTH");
 
         Components components = new Components()
-                .addSecuritySchemes(auth_header, new SecurityScheme()
-                        .name(auth_header)
+                .addSecuritySchemes(access_token_header, new SecurityScheme()
+                        .name(access_token_header)
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT"))
+                .addSecuritySchemes(refresh_token_header, new SecurityScheme()
+                        .name(refresh_token_header)
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
                         .bearerFormat("JWT"));

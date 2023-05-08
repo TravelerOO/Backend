@@ -3,6 +3,7 @@ package com.example.miniproject.exception;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.StatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,7 +21,8 @@ public class ExceptionAdvisor {
     // IllegalArgumentException & NullPointerException 예외 처리
     @ExceptionHandler(value = {IllegalArgumentException.class,
                                NullPointerException.class,
-                               IllegalStateException.class})
+                               IllegalStateException.class,
+                               UsernameNotFoundException.class})
     public ResponseEntity<Object> handleIllegalArgumentException(Exception ex) {
         String errorMsg = ex.getMessage();
 
