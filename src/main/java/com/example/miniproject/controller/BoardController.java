@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BoardController {
 
@@ -34,7 +34,7 @@ public class BoardController {
         return boardService.getBoarsWithFilter(filterRequestDto);
     }
 
-    @DeleteMapping("/{boardId}")
+    @DeleteMapping("/boards/{board_id}")
     public ResponseEntity<MsgAndHttpStatusDto> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.deleteBoard(boardId, userDetails);
     }
