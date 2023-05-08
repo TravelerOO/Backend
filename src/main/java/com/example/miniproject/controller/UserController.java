@@ -3,7 +3,6 @@ package com.example.miniproject.controller;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;

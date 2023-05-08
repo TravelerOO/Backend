@@ -3,7 +3,6 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
