@@ -38,6 +38,11 @@ dependencies {
 
 }
 
+jar {
+baseName = 'application'
+version = ''
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
