@@ -39,8 +39,7 @@ dependencies {
 }
 
 jar {
-baseName = 'application'
-version = ''
+    enabled = false
 }
 
 tasks.named('test') {
