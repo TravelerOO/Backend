@@ -64,7 +64,7 @@ public class WebSecurityConfig {
                         .anyRequest()
                         .authenticated())
                 // JWT 인증/인가를 사용하기 위한 설정
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 //                // 소셜로그인 사용하기
 //                .oauth2Login()
 //                .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
