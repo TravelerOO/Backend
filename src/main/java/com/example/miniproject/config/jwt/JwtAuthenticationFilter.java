@@ -4,9 +4,11 @@ import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,32 +28,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.resolveAccessToken(request);
         String refreshToken = jwtUtil.resolveRefreshToken(request);
 
+        if (refreshToken != null && accessToken != null) {
 
-        if (accessToken != null) {
+            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
+                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
+                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
 
-            if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
-                this.setAuthentication(accessToken);
-            } else if (!jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey()) && refreshToken != null) {
-                boolean validateRefreshToken = jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey());
-
-                boolean isRefreshToken = jwtUtil.existsRefreshToken(refreshToken);
-                if (validateRefreshToken && isRefreshToken) {
-                    String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
-                    /// 토큰 발급
-                    String newAccessToken = jwtUtil.createAccessToken(userId);
-                    /// 헤더에 어세스 토큰 추가
-                    jwtUtil.setHeaderAccessToken(response, newAccessToken);
-                    /// 컨텍스트에 넣기
-                    this.setAuthentication(newAccessToken);
-                }
-            }
-
+                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
+                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
+                            /// 토큰 발급
+                            String newAccessToken = jwtUtil.createAccessToken(userId);
+                            /// 헤더에 어세스 토큰 추가
+                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
+                        }
+                        try {
+                            this.setAuthentication(userId);
+                        } catch (Exception e) {
+                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                            return;
+                        }
+                    } else jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                } else jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+            } else
+                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
         }
-        filterChain.doFilter(request, response);
 
+        filterChain.doFilter(request, response);
     }
 
-    public void setAuthentication(String userId) {
+
+    public void setAuthentication(String userId) throws UsernameNotFoundException {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(userId);
         context.setAuthentication(authentication);
@@ -62,6 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
             String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
