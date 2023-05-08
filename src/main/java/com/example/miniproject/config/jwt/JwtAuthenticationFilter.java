@@ -1,6 +1,7 @@
 package com.example.miniproject.config.jwt;
 
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
+import com.example.miniproject.dto.http.DefaultRes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
+            String json = new ObjectMapper().writeValueAsString(DefaultRes.res(statusCode, msg));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
