@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import javax.security.sasl.AuthenticationException;
 import java.time.Duration;
 
 @Service
@@ -24,6 +25,10 @@ public class RedisService {
     }
 
     public void deleteValues(String token) {
-        redisTemplate.delete(token);
+        if(redisTemplate.delete(token)) {
+            return;
+        } else {
+            throw new IllegalArgumentException("알 수 없는 RefreshToken 에 대한 삭제 요청이 들어왔습니다.");
+        }
     }
 }
