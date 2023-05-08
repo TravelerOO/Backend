@@ -29,10 +29,10 @@ jobs:
       with:
         files: ./src/main/resources/application.properties
       env:
-        spring.datasource.username: ${{secret.DB_USERNAME}}
-        spring.datasource.password: ${{secret.DB_PASSWORD}}
-        cloud.aws.credentials.accessKey: ${{secret.S3_ACCESS_KEY}}
-        cloud.aws.credentials.secretKey: ${{secret.S3_SECRET_KEY}}
+        spring.datasource.username: ${{secrets.DB_USERNAME}}
+        spring.datasource.password: ${{secrets.DB_PASSWORD}}
+        cloud.aws.credentials.accessKey: ${{secrets.S3_ACCESS_KEY}}
+        cloud.aws.credentials.secretKey: ${{secrets.S3_SECRET_KEY}}
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
     - name: 프로젝트 빌드
