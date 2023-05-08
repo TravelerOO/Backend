@@ -22,7 +22,6 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final RedisService redisService;

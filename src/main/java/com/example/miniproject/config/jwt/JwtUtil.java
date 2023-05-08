@@ -77,15 +77,17 @@ public class JwtUtil {
 
     // header 에서 AccessToken 가져오기
     public String resolveAccessToken(HttpServletRequest request) {
-        if (request.getHeader("Authorization") != null)
-            return request.getHeader("Authorization").substring(7);
+        String token = request.getHeader(AUTHORIZATION_HEADER);
+        if (token != null && token.length() >= 8)
+            return token.substring(7);
         return null;
     }
 
     // header 에서 RefreshToken 가져오기
     public String resolveRefreshToken(HttpServletRequest request) {
-        if (request.getHeader("RefreshToken") != null)
-            return request.getHeader("RefreshToken").substring(7);
+        String token = request.getHeader(REFRESHTOKEN_HEADER);
+        if (token != null && token.length() >= 8)
+            return token.substring(7);
         return null;
     }
 

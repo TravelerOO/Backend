@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         if (accessToken != null) {
-
             if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
                 try {
                     this.setAuthentication(jwtUtil.getUserInfoFromToken(accessToken).getSubject());
@@ -58,8 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             }
-
         }
+
         filterChain.doFilter(request, response);
 
     }
