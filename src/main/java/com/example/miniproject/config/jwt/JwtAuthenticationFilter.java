@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (accessToken != null) {
 
             if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
-                this.setAuthentication(accessToken);
+                this.setAuthentication(jwtUtil.getUserInfoFromToken(accessToken).getSubject());
             } else if (!jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey()) && refreshToken != null) {
                 boolean validateRefreshToken = jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey());
 
@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     /// 헤더에 어세스 토큰 추가
                     jwtUtil.setHeaderAccessToken(response, newAccessToken);
                     /// 컨텍스트에 넣기
-                    this.setAuthentication(newAccessToken);
+                    this.setAuthentication(userId);
                 }
             }
 
