@@ -1,12 +1,15 @@
 package com.example.miniproject.config.jwt;
 
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
+import com.example.miniproject.dto.http.DefaultRes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -28,32 +31,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         if (accessToken != null) {
-            String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
-
             if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
-                this.setAuthentication(accessToken);
+                try {
+                    this.setAuthentication(jwtUtil.getUserInfoFromToken(accessToken).getSubject());
+                } catch (UsernameNotFoundException e){
+                    jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                    return;
+                }
             } else if (!jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey()) && refreshToken != null) {
                 boolean validateRefreshToken = jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey());
 
                 boolean isRefreshToken = jwtUtil.existsRefreshToken(refreshToken);
                 if (validateRefreshToken && isRefreshToken) {
+                    String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
                     /// 토큰 발급
                     String newAccessToken = jwtUtil.createAccessToken(userId);
                     /// 헤더에 어세스 토큰 추가
                     jwtUtil.setHeaderAccessToken(response, newAccessToken);
                     /// 컨텍스트에 넣기
-                    this.setAuthentication(newAccessToken);
+                    try {
+                        this.setAuthentication(userId);
+                    } catch (UsernameNotFoundException e){
+                        jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                        return;
+                    }
                 }
             }
-
         }
+
         filterChain.doFilter(request, response);
 
     }
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String userId) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(username);
+        Authentication authentication = jwtUtil.createAuthentication(userId);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
@@ -62,8 +74,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
-            String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
+            String json = new ObjectMapper().writeValueAsString(DefaultRes.res(statusCode, msg));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());

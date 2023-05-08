@@ -4,7 +4,6 @@ import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.UserIdRequestDto;
-import com.example.miniproject.entity.RefreshToken;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
@@ -13,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
@@ -22,8 +22,9 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final RedisService redisService;
 
     @Transactional
     public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
@@ -36,6 +37,7 @@ public class UserService {
         System.out.println(password);
         System.out.println(user.getPassword());
 
+        System.out.println(passwordEncoder.encode(password));
         if (!passwordEncoder.matches(password,user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
@@ -43,7 +45,7 @@ public class UserService {
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        tokenRepository.save(new RefreshToken(refreshToken));
+        redisService.setValues(refreshToken, user.getUserId());
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
         response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
@@ -58,6 +60,12 @@ public class UserService {
             throw new IllegalStateException("이미 아이디가 존재합니다.");
         }
     }
+
+    @Transactional
+    public void logout(HttpServletRequest request) {
+        redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
+    }
+
     //회원가입
     @Transactional
     public void signup(SignupRequestDto signupRequestDto){

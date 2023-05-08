@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -26,6 +27,12 @@ public class UserController {
     public ResponseEntity<MsgAndHttpStatusDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto,response);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("로그인 성공", HttpStatus.OK.value()));
+    }
+
+    @GetMapping("/user/logout")
+    public ResponseEntity<MsgAndHttpStatusDto> logout(HttpServletRequest request) {
+        userService.logout(request);
+        return ResponseEntity.ok(new MsgAndHttpStatusDto("로그아웃 성공", HttpStatus.OK.value()));
     }
 
     //아이디 중복확인
