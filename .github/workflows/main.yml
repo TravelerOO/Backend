@@ -10,10 +10,6 @@ env:
   AWS_S3_BUCKET: 6zo
   AWS_CODE_DEPLOY_APPLICATION: cicid-test-CD
   AWS_CODE_DEPLOY_GROUP: cicd-test-CD-group
-  spring.datasource.username: ${{secret.DB_USERNAME}}
-  spring.datasource.password: ${{secret.DB_PASSWORD}}
-  cloud.aws.credentials.accessKey: ${{secret.S3_ACCESS_KEY}}
-  cloud.aws.credentials.secretKey: ${{secret.S3_SECRET_KEY}}
 
 jobs:
   build-with-gradle:
@@ -32,6 +28,11 @@ jobs:
       uses: microsoft/variable-substitution@v1
       with:
         files: ./src/main/resources/application.properties
+      env:
+        spring.datasource.username: ${{secret.DB_USERNAME}}
+        spring.datasource.password: ${{secret.DB_PASSWORD}}
+        cloud.aws.credentials.accessKey: ${{secret.S3_ACCESS_KEY}}
+        cloud.aws.credentials.secretKey: ${{secret.S3_SECRET_KEY}}
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
     - name: 프로젝트 빌드
