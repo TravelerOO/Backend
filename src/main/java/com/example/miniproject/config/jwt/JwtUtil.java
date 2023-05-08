@@ -116,12 +116,12 @@ public class JwtUtil {
 
     // 어세스 토큰 헤더 설정
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {
-        response.setHeader("Authorization", "bearer " + accessToken);
+        response.setHeader(AUTHORIZATION_HEADER, "bearer " + accessToken);
     }
 
     // 리프레시 토큰 헤더 설정
     public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
-        response.setHeader("RefreshToken", "bearer " + refreshToken);
+        response.setHeader(REFRESHTOKEN_HEADER, "bearer " + refreshToken);
     }
 
     // RefreshToken 존재유무 확인
