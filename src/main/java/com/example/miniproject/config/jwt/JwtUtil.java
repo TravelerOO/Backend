@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +33,9 @@ public class JwtUtil {
     public static final String REFRESHTOKEN_HEADER = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final long TOKEN_TIME = 60000L;
+    private static final long TOKEN_TIME = 60*30L; // 30분으로 설정
 
-    private static final long REFRESH_TOKEN_TIME = 1 * 60 * 1000L;
+    private static final long REFRESH_TOKEN_TIME =60*60*3L; // 3시간으로 설정
 
     @Value("${jwt.secret.access-key}")
     private String accessSecretKey;
@@ -82,6 +81,7 @@ public class JwtUtil {
             return request.getHeader("Authorization").substring(7);
         return null;
     }
+
     // header 에서 RefreshToken 가져오기
     public String resolveRefreshToken(HttpServletRequest request) {
         if (request.getHeader("RefreshToken") != null)
@@ -126,6 +126,7 @@ public class JwtUtil {
     public boolean existsRefreshToken(String refreshToken) {
         return tokenRepository.existsByRefreshToken(refreshToken);
     }
+
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(token).getBody();
     }
@@ -133,6 +134,14 @@ public class JwtUtil {
     public Authentication createAuthentication(String userId) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    public Long getExpiration(String accessToken) {
+        // accessToken 남은 유효시간
+        Date expiration = Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken).getBody().getExpiration();
+        // 현재 시간
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
     }
 
 
