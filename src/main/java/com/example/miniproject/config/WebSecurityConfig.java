@@ -4,6 +4,7 @@ import com.example.miniproject.config.jwt.JwtAuthenticationFilter;
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.config.oauth.OAuth2AuthenticationSuccessHandler;
 import com.example.miniproject.config.oauth.UserOAuth2Service;
+import com.example.miniproject.config.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class WebSecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -69,6 +71,9 @@ public class WebSecurityConfig {
                 .successHandler(oAuth2AuthenticationSuccessHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행
                 .userInfoEndpoint()
                 .userService(userOAuth2Service); // 로그인이 성공하면 해당 유저의 정보를 들고 userOAuth2Service에서 후처리를 해주겠다는의미.
+
+        // 401 에러 핸들링
+        http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
         return http.build();
     }
