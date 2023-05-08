@@ -25,27 +25,29 @@ public class UserController {
 
     @PostMapping("/user/login")
     public ResponseEntity<MsgAndHttpStatusDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        userService.login(loginRequestDto,response);
+        userService.login(loginRequestDto, response);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("로그인 성공", HttpStatus.OK.value()));
     }
 
     @GetMapping("/user/logout")
     public ResponseEntity<MsgAndHttpStatusDto> logout(HttpServletRequest request) {
+
         userService.logout(request);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("로그아웃 성공", HttpStatus.OK.value()));
+        return ResponseEntity.ok(new MsgAndHttpStatusDto("로그아웃 완료!", HttpStatus.OK.value()));
     }
 
     //아이디 중복확인
     @PostMapping("/user/signup/id")
-    public ResponseEntity<MsgAndHttpStatusDto> checkId (@Valid @RequestBody UserIdRequestDto userIdRequestDto){
+    public ResponseEntity<MsgAndHttpStatusDto> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
         userService.checkId(userIdRequestDto);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.",HttpStatus.OK.value()));
+        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.", HttpStatus.OK.value()));
     }
+
     //회원가입
     @PostMapping("/user/signup")
     public ResponseEntity<MsgAndHttpStatusDto> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("회원가입 성공",HttpStatus.OK.value()));
+        return ResponseEntity.ok(new MsgAndHttpStatusDto("회원가입 성공", HttpStatus.OK.value()));
     }
 
     @GetMapping("/user/kakaologin/{jwt}")
