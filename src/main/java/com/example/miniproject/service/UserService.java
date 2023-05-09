@@ -3,7 +3,6 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,12 +50,10 @@ public class UserService {
     }
 
     //아이디 중복확인
-    @Transactional
-    public void checkId(UserIdRequestDto userIdRequestDto) {
-        String userId = userIdRequestDto.getUserId();
-
+    @Transactional(readOnly = true)
+    public void checkId(String userId) {
         if (userRepository.existsByUserId(userId)) {
-            throw new IllegalStateException("이미 아이디가 존재합니다.");
+            throw new IllegalStateException("이미 사용중인 아이디입니다.");
         }
     }
 

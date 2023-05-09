@@ -3,7 +3,6 @@ package com.example.miniproject.controller;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
@@ -23,13 +22,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/user/login")
+    @PostMapping("//api/user/login")
     public ResponseEntity<MsgAndHttpStatusDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("로그인 성공", HttpStatus.OK.value()));
     }
 
-    @GetMapping("/user/logout")
+    @GetMapping("/api/user/logout/")
     public ResponseEntity<MsgAndHttpStatusDto> logout(HttpServletRequest request) {
 
         userService.logout(request);
@@ -37,14 +36,14 @@ public class UserController {
     }
 
     //아이디 중복확인
-    @PostMapping("/user/signup/id")
-    public ResponseEntity<MsgAndHttpStatusDto> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
-        userService.checkId(userIdRequestDto);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.", HttpStatus.OK.value()));
+    @GetMapping("/api/user/signup/id")
+    public ResponseEntity<MsgAndHttpStatusDto> checkId (@Valid @RequestParam String userId) {
+        userService.checkId(userId);
+        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.",HttpStatus.OK.value()));
     }
 
     //회원가입
-    @PostMapping("/user/signup")
+    @PostMapping("/api/user/signup")
     public ResponseEntity<MsgAndHttpStatusDto> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("회원가입 성공", HttpStatus.OK.value()));
