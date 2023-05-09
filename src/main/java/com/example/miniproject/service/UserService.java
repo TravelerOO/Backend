@@ -69,8 +69,9 @@ public class UserService {
         if (request.getHeader(JwtUtil.REFRESHTOKEN_HEADER) != null && redisService.getValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER)) != null) {
             redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
             tokenRepository.deleteByRefreshToken(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER).substring(7));
+        } else {
+            throw new CustomException(ResponseMessage.WRONG_ACCESS, StatusCode.BAD_REQUEST);
         }
-        throw new CustomException(ResponseMessage.WRONG_ACCESS, StatusCode.BAD_REQUEST);
     }
 
     //회원가입
@@ -82,10 +83,10 @@ public class UserService {
         String nickname = signupRequestDto.getNickname();
 
         Optional<User> found = userRepository.findByUserId(userId);
-        if(userRepository.existsByUserId(userId)){
+        if (userRepository.existsByUserId(userId)) {
             throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.ID_DUPLICATE);
         }
-        User user = new User(userId,password,nickname);
+        User user = new User(userId, password, nickname);
         userRepository.save(user);
     }
 }
