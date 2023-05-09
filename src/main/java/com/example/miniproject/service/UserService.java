@@ -2,10 +2,14 @@ package com.example.miniproject.service;
 
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
+import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
+import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,12 +54,12 @@ public class UserService {
     }
 
     //아이디 중복확인
-    @Transactional(readOnly = true)
-    public void checkId(String userId) {
-        if (userRepository.existsByUserId(userId)) {
-            throw new IllegalStateException("이미 사용중인 아이디입니다.");
-        }
-    }
+//    @Transactional(readOnly = true)
+//    public void checkId(String userId) {
+//        if (userRepository.existsByUserId(userId)) {
+//            throw new IllegalStateException("이미 사용중인 아이디입니다.");
+//        }
+//    }
 
     @Transactional
     public void logout(HttpServletRequest request) {
@@ -73,16 +77,17 @@ public class UserService {
 
     //회원가입
     @Transactional
-    public void signup(SignupRequestDto signupRequestDto){
+    public MsgAndHttpStatusDto signup (SignupRequestDto signupRequestDto){
         String userId = signupRequestDto.getUserId();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
         Optional<User> found = userRepository.findByUserId(userId);
         if(userRepository.existsByUserId(userId)){
-            throw new IllegalStateException("아이디 중복확인을 해주세요.");
+            return new MsgAndHttpStatusDto("존재하는 아이디 입니다.", StatusCode.ID_DUPLICATE);
         }
         User user = new User(userId,password,nickname);
         userRepository.save(user);
+        return new MsgAndHttpStatusDto("회원가입 성공", HttpStatus.OK.value());
     }
 }
