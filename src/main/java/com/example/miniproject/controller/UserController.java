@@ -20,15 +20,18 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
+
 
     @PostMapping("/user/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
         return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
     }
+
 
     @GetMapping("/user/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -37,6 +40,7 @@ public class UserController {
     }
 
     //아이디 중복확인
+
     @PostMapping("/user/signup/id")
     public ResponseEntity<?> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
         userService.checkId(userIdRequestDto);
@@ -50,16 +54,14 @@ public class UserController {
         return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.CREATED_USER));
     }
 
-    @GetMapping("/user/kakaologin/{jwt}")
+    @GetMapping("/kakaologin/{jwt}")
     public ResponseEntity<?> login_success(@PathVariable String jwt, HttpServletResponse response) throws Exception {
 
         System.out.println("카카오 로그인 성공 컨트롤러 진입");
-
         // 로그인 시도
         response.addHeader("Authorization", "Bearer " + jwt);
 
         return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
-
 
     }
 }

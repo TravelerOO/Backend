@@ -10,6 +10,7 @@ import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.entity.Board;
+import com.example.miniproject.exception.CustomException;
 import com.example.miniproject.repository.BoardRepository;
 import com.example.miniproject.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
@@ -31,78 +32,43 @@ public class BoardService {
     private final S3Uploader s3Uploader;
 
     @Transactional
-    public ResponseEntity<?> createBoard(BoardRequestDto boardRequestDto, UserDetailsImp userDetailsImp) throws IOException {
-        // S3 에 이미지 저장(MultiPartFile 이 거치는 임시 저장 경로에서 tmp 파일이 삭제 안 되는 상황, S3및 DB 저장은 성공)
-        if (boardRequestDto.getImage() != null) {
+    public ResponseEntity<BoardResponseDto> createBoard(BoardRequestDto boardRequestDto, UserDetailsImp userDetailsImp) {
+        // 입력값 중 하나라도 null 이면 exception 처리
+        if (boardRequestDto.getTitle() == null || boardRequestDto.getImage() == null || boardRequestDto.getStar() == null ||
+            boardRequestDto.getLocation() == null || boardRequestDto.getPlacename() == null || boardRequestDto.getContent() == null ||
+            boardRequestDto.getSeason() == null) {
+            throw new CustomException(ResponseMessage.WRONG_FORMAT, StatusCode.BAD_REQUEST);
+        }
+
+        try { // upload method 에서 발생하는 IOException 을 Customize 하기 위해 try-catch 사용
             String imgPath = s3Uploader.upload(boardRequestDto.getImage());
             Board board = new Board(boardRequestDto, imgPath);
             board.setUser(userDetailsImp.getUser());
             boardRepository.save(board);
             BoardResponseDto boardResponseDto = new BoardResponseDto(board);
-
             //수정
             return ResponseEntity.ok(DefaultDataRes.dataRes(StatusCode.OK, ResponseMessage.BOARD_CREATE,boardResponseDto));
+        } catch (IOException e) {
+            throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
         }
-
-        throw new IllegalArgumentException("이미지 파일을 업로드해주세요");
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getBoarsWithFilter(FilterRequestDto filterRequestDto) {
-        List<Board> boardList = null;
-
-        if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() == null & filterRequestDto.getKeyword() == null) { // keyword : x, location : x, star : x
-            boardList = boardRepository.findAllBySeasonOrderByCreatedAtDesc(filterRequestDto.getSeason());
-        } else { // 2. 그 외 필터 조건들 있을 경우 조건 모두 반영
-            if (filterRequestDto.getKeyword() != null) {
-                if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() == null) { // keyword : o, location : x, star : x
-                    boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                } else if (filterRequestDto.getLocation() != null && filterRequestDto.getStar() == null) { // keyword : o, location : o, star : x
-                    boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                } else if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() != null) { // // keyword : o, location : x, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                    }
-                } else { // keyword : o, location : o, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                    }
-                }
-            } else {
-                if (filterRequestDto.getLocation() != null && filterRequestDto.getStar() == null) { // keyword : x, location : o, star : x
-                    boardList = boardRepository.findAllBySeasonAndLocationOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                } else if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() != null) { // keyword : x, location : x, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonOrderByStar(filterRequestDto.getSeason());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonOrderByStarDesc(filterRequestDto.getSeason());
-                    }
-                } else { // keyword : x, location : o, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndLocationOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndLocationOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                    }
-                }
-            }
-        }
+    public ResponseEntity<List<BoardResponseDto>> getBoarsWithFilter(FilterRequestDto filterRequestDto) {
+        List<Board> boardList = boardRepository.search(filterRequestDto);
         List<BoardResponseDto> boardResponseDtoList = boardList.stream().map(BoardResponseDto::new).toList();
         //수정
         return ResponseEntity.ok(DefaultDataRes.dataRes(StatusCode.OK, ResponseMessage.BOARD_CREATE,boardResponseDtoList));
     }
-
+  
     @Transactional
     public ResponseEntity<?> deleteBoard(Long boardId, UserDetailsImp userDetails) {
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 게시글입니다.")
+                () -> new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.BAD_REQUEST)
         );
 
         if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
-            throw new IllegalArgumentException("본인이 작성한 글만 삭제할 수 있습니다.");
+            throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.BAD_REQUEST);
         }
 
         String imgPath = board.getImage();
@@ -111,6 +77,6 @@ public class BoardService {
             return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.BOARD_DELETE));
         }
 
-        throw new IllegalArgumentException("삭제에 실패했습니다.");
+        throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.INTERNAL_SERVER_ERROR);
     }
 }

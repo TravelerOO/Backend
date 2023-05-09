@@ -21,24 +21,25 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
     public ResponseEntity<?> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
 
         return boardService.createBoard(boardRequestDto, userDetails);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/boards")
     public ResponseEntity<?> getBoardsWithFilter(@ModelAttribute FilterRequestDto filterRequestDto) {
         return boardService.getBoarsWithFilter(filterRequestDto);
     }
 
-    @DeleteMapping("/{boardId}")
+    @DeleteMapping("/boards/{boardId}")
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.deleteBoard(boardId, userDetails);
     }

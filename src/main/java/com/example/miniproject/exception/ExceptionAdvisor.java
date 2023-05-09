@@ -19,15 +19,13 @@ import java.util.Map;
 @RestController
 public class ExceptionAdvisor {
 
-    // IllegalArgumentException & NullPointerException 예외 처리
-    @ExceptionHandler(value = {IllegalArgumentException.class,
-                               NullPointerException.class,
-                               IllegalStateException.class,
-                               })
-    public ResponseEntity<Object> handleIllegalArgumentException(Exception ex) {
-        String errorMsg = ex.getMessage();
+    // CustomException 처리
+    @ExceptionHandler(value = {CustomException.class})
+    public ResponseEntity<Object> handleCustomException(CustomException ex) {
+        String msg = ex.getMsg();
+        int statusCode = ex.getStatusCode();
 
-        return ResponseEntity.badRequest().body(DefaultRes.res(StatusCode.BAD_REQUEST, errorMsg));
+        return ResponseEntity.badRequest().body(DefaultRes.res(statusCode, msg));
 
     }
 
@@ -36,10 +34,11 @@ public class ExceptionAdvisor {
     public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         Map<String, String> errorMap = new HashMap<>();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
+        if (bindingResult.hasErrors()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
+            }
         }
-
         return ResponseEntity.badRequest().body(DefaultDataRes.dataRes(StatusCode.BAD_REQUEST, null, errorMap));
     }
 }

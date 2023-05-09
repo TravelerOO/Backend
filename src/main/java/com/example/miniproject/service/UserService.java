@@ -3,8 +3,12 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
+import com.example.miniproject.dto.http.ResponseMessage;
+import com.example.miniproject.dto.http.StatusCode;
+import com.example.miniproject.entity.RefreshToken;
 import com.example.miniproject.entity.User;
+import com.example.miniproject.exception.CustomException;
+import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final TokenRepository tokenRepository;
     private final RedisService redisService;
 
     @Transactional
@@ -31,62 +35,57 @@ public class UserService {
         String password = loginRequestDto.getPassword();
 
         User user = userRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("가입하지 않은 회원입니다."));// 예외처리 해주기
+                () -> new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.UNAUTHORIZED));// 예외처리 해주기
 
         System.out.println(password);
         System.out.println(user.getPassword());
 
         System.out.println(passwordEncoder.encode(password));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.UNAUTHORIZED);
         }
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
         redisService.setValues(refreshToken, user.getUserId());
+        RefreshToken refreshTokenEntity = new RefreshToken(refreshToken.substring(7));
+        tokenRepository.save(refreshTokenEntity);
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
         response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
     }
 
     //아이디 중복확인
-    @Transactional
-    public void checkId(UserIdRequestDto userIdRequestDto) {
-        String userId = userIdRequestDto.getUserId();
-
+    @Transactional(readOnly = true)
+    public void checkId(String userId) {
         if (userRepository.existsByUserId(userId)) {
-            throw new IllegalStateException("이미 아이디가 존재합니다.");
+            throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.ID_DUPLICATE);
         }
     }
 
     @Transactional
     public void logout(HttpServletRequest request) {
-        if (request.getHeader(JwtUtil.REFRESHTOKEN_HEADER) == null) {
-            throw new IllegalStateException("잘못된 접근입니다");
-        }
-
-        if (redisService.getValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER)) != null) {
+        if (request.getHeader(JwtUtil.REFRESHTOKEN_HEADER) != null && redisService.getValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER)) != null) {
             redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
-        } else {
-            throw new IllegalStateException("잘못된 접근입니다");
+            tokenRepository.deleteByRefreshToken(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER).substring(7));
         }
-
+        throw new CustomException(ResponseMessage.WRONG_ACCESS, StatusCode.BAD_REQUEST);
     }
 
     //회원가입
     @Transactional
     public void signup(SignupRequestDto signupRequestDto) {
+        // 지훈님 수정 후 exception customizing 필요
         String userId = signupRequestDto.getUserId();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-        String name = signupRequestDto.getName();
 
         Optional<User> found = userRepository.findByUserId(userId);
-        if (userRepository.existsByUserId(userId)) {
+        if(userRepository.existsByUserId(userId)){
             throw new IllegalStateException("아이디 중복확인을 해주세요.");
         }
-        User user = new User(userId, password, nickname, name);
+        User user = new User(userId,password,nickname);
         userRepository.save(user);
     }
 }

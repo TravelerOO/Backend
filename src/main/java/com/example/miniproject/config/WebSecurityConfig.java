@@ -27,13 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/user/**",
+            "/api/user/**",
             "/member/authenticate",
             "/auth/**",
             "/oauth2/authorization/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/board/list"
+            "/api/boards"
+//            "/api/board"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
@@ -65,13 +66,14 @@ public class WebSecurityConfig {
                         .anyRequest()
                         .authenticated())
                 // JWT 인증/인가를 사용하기 위한 설정
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
-                // 소셜로그인 사용하기
-                .oauth2Login()
-                .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
-                .successHandler(oAuth2AuthenticationSuccessHandler).failureHandler(customAuthenticationFailureHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행
-                .userInfoEndpoint()
-                .userService(userOAuth2Service); // 로그인이 성공하면 해당 유저의 정보를 들고 userOAuth2Service에서 후처리를 해주겠다는의미.
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+//                // 소셜로그인 사용하기
+//                .oauth2Login()
+//                .defaultSuccessUrl("/main") // ouauth 로그인이 성공했을시에 이동하게되는 url
+//                .successHandler(oAuth2AuthenticationSuccessHandler) // 인증 프로세서에 따라 사용자 정의로직을 실행
+//                .userInfoEndpoint()
+//                .userService(userOAuth2Service); // 로그인이 성공하면 해당 유저의 정보를 들고 userOAuth2Service에서 후처리를 해주겠다는의미.
+
 
         // 401 에러 핸들링
         http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);

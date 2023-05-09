@@ -28,8 +28,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.resolveAccessToken(request);
         String refreshToken = jwtUtil.resolveRefreshToken(request);
 
-        if (refreshToken != null && accessToken != null) {
+//        if (refreshToken != null && accessToken != null) {
+//            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
+//                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
+//                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
+//
+//                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
+//                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
+//                            /// 토큰 발급
+//                            String newAccessToken = jwtUtil.createAccessToken(userId);
+//                            /// 헤더에 어세스 토큰 추가
+//                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
+//                        }
+//                        try {
+//                            this.setAuthentication(userId);
+//                        } catch (UsernameNotFoundException e) {
+//                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+//                            return;
+//                        }
+//                    } else {
+//                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                        return;
+//                    }
+//                } else {
+//                    System.out.println("1번");
+//                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                    return;
+//                }
+//            } else { // 여기서 걸림
+//                System.out.println("2번");
+//                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                return;
+//            }
+//        }
 
+        if (refreshToken != null && accessToken != null) {
+            System.out.println(refreshToken);
+            System.out.println(jwtUtil.existsRefreshToken(refreshToken));
             if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
                 if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
                     if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
@@ -47,12 +82,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
                             return;
                         }
-                    } else jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-                } else jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-            } else
+                    } else {
+                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                        return;
+                    }
+                } else {
+                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    return;
+                }
+            } else {
                 jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-        }
+                return;
+            }
 
+        }
         filterChain.doFilter(request, response);
 
     }
@@ -68,6 +111,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
             String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
