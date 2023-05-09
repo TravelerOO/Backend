@@ -25,6 +25,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping(value = "/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
     public ResponseEntity<?> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
         return boardService.createBoard(boardRequestDto, userDetails);
     }
@@ -34,7 +35,7 @@ public class BoardController {
         return boardService.getBoarsWithFilter(filterRequestDto);
     }
 
-    @DeleteMapping("/boards/{board_id}")
+    @DeleteMapping("/boards/{boardId}")
     public ResponseEntity<MsgAndHttpStatusDto> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.deleteBoard(boardId, userDetails);
     }

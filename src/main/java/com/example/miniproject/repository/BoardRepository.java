@@ -10,6 +10,4 @@ import java.util.List;
 
 
 public interface BoardRepository extends JpaRepository<Board, Long> , BoardSearch {
-    @Query(value = "select now()", nativeQuery = true)
-    String getTime();
 }
