@@ -94,13 +94,13 @@ sourceSets {
 
 bootJar {
 
-	doFirst {
-		def jasyptPropertiesFile = file("${rootDir}/jasypt.properties")
-		if (jasyptPropertiesFile.exists()) {
-			jvmArguments = ["--jasypt.encryptor.password=${jasyptPropertiesFile.text.trim()}"]
-		} else {
-			throw new IllegalStateException("jasypt.properties 파일이 존재하지 않습니다.")
-		}
-	}
+//	doFirst {
+//		def jasyptPropertiesFile = file("${rootDir}/jasypt.properties")
+//		if (jasyptPropertiesFile.exists()) {
+//			jvmArguments = ["--jasypt.encryptor.password=${jasyptPropertiesFile.text.trim()}"]
+//		} else {
+//			throw new IllegalStateException("jasypt.properties 파일이 존재하지 않습니다.")
+//		}
+//	}
 	duplicatesStrategy 'exclude'
 }

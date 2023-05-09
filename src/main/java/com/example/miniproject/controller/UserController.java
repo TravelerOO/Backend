@@ -2,10 +2,8 @@ package com.example.miniproject.controller;
 
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
-<<<<<<< HEAD
 import com.example.miniproject.dto.http.DefaultDataRes;
-=======
->>>>>>> 34274419fb645deb8a7455c92fe83da1ae64a3d7
+
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
