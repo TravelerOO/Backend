@@ -3,12 +3,7 @@ package com.example.miniproject.controller;
 
 import com.example.miniproject.config.security.UserDetailsImp;
 import com.example.miniproject.dto.BoardRequestDto;
-import com.example.miniproject.dto.BoardResponseDto;
 import com.example.miniproject.dto.FilterRequestDto;
-import com.example.miniproject.dto.MsgAndHttpStatusDto;
-import com.example.miniproject.dto.http.DefaultRes;
-import com.example.miniproject.dto.http.ResponseMessage;
-import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.service.BoardService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")

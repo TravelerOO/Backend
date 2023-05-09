@@ -4,7 +4,6 @@ import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.StatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,7 +24,7 @@ public class ExceptionAdvisor {
         String msg = ex.getMsg();
         int statusCode = ex.getStatusCode();
 
-        return ResponseEntity.badRequest().body(DefaultRes.res(statusCode, msg));
+        return ResponseEntity.badRequest().body(new DefaultRes<>(statusCode, msg));
 
     }
 
@@ -39,6 +38,6 @@ public class ExceptionAdvisor {
                 errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
         }
-        return ResponseEntity.badRequest().body(DefaultDataRes.dataRes(StatusCode.BAD_REQUEST, null, errorMap));
+        return ResponseEntity.badRequest().body(new DefaultDataRes<Map<String, String>>(StatusCode.BAD_REQUEST, null, errorMap));
     }
 }

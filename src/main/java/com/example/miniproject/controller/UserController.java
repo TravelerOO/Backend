@@ -1,15 +1,16 @@
 package com.example.miniproject.controller;
 
 import com.example.miniproject.dto.LoginRequestDto;
-import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
+<<<<<<< HEAD
 import com.example.miniproject.dto.http.DefaultDataRes;
+=======
+>>>>>>> 34274419fb645deb8a7455c92fe83da1ae64a3d7
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,23 +29,29 @@ public class UserController {
     @PostMapping("/user/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
-        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
     }
 
 
     @GetMapping("/user/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
-        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
     }
 
     //아이디 중복확인
+
+//    @PostMapping("/user/signup/id")
+//    public ResponseEntity<?> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
+//        userService.checkId(userIdRequestDto);
+//        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.Available_ID));
+//    }
 
     //회원가입
     @PostMapping("/user/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.CREATED_USER));
+        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
     }
 
     @GetMapping("/kakaologin/{jwt}")
@@ -53,8 +60,6 @@ public class UserController {
         System.out.println("카카오 로그인 성공 컨트롤러 진입");
         // 로그인 시도
         response.addHeader("Authorization", "Bearer " + jwt);
-
-        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
-
+        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
     }
 }
