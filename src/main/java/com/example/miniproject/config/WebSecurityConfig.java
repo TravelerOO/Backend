@@ -37,7 +37,6 @@ public class WebSecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/boards"
-//            "/api/board"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
@@ -97,6 +96,7 @@ public class WebSecurityConfig {
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
         config.addExposedHeader(JwtUtil.REFRESHTOKEN_HEADER);
         config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
         config.setAllowCredentials(true);
         config.validateAllowCredentials();
 
