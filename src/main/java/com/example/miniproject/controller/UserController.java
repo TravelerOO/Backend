@@ -24,29 +24,21 @@ public class UserController {
     private final UserService userService;
 
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
         return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
     }
 
 
-    @GetMapping("/user/logout")
+    @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
         return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
     }
 
-    //아이디 중복확인
-
-//    @PostMapping("/user/signup/id")
-//    public ResponseEntity<?> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
-//        userService.checkId(userIdRequestDto);
-//        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.Available_ID));
-//    }
-
     //회원가입
-    @PostMapping("/user/signup")
+    @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
         return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
