@@ -83,7 +83,7 @@ public class UserService {
 
         Optional<User> found = userRepository.findByUserId(userId);
         if(userRepository.existsByUserId(userId)){
-            throw new IllegalStateException("아이디 중복확인을 해주세요.");
+            throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.ID_DUPLICATE);
         }
         User user = new User(userId,password,nickname);
         userRepository.save(user);
