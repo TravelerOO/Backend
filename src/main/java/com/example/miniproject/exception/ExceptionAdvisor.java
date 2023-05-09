@@ -33,10 +33,11 @@ public class ExceptionAdvisor {
     public ResponseEntity<Object> handleValidException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         Map<String, String> errorMap = new HashMap<>();
-        for (FieldError fieldError : bindingResult.getFieldErrors()) {
-            errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
+        if (bindingResult.hasErrors()) {
+            for (FieldError fieldError : bindingResult.getFieldErrors()) {
+                errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
+            }
         }
-
         return ResponseEntity.badRequest().body(DefaultRes.res(StatusCode.BAD_REQUEST, "", errorMap));
     }
 }

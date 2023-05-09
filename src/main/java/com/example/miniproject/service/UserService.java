@@ -56,7 +56,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public void checkId(String userId) {
         if (userRepository.existsByUserId(userId)) {
-            throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.CONFLICT);
+            throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.ID_DUPLICATE);
         }
     }
 

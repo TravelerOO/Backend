@@ -47,10 +47,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
                             return;
                         }
-                    } else jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-                } else jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-            } else
+                    } else {
+                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                        return;
+                    }
+                } else {
+                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    return;
+                }
+            } else {
                 jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);
@@ -68,6 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
             String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
