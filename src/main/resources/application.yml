@@ -29,8 +29,8 @@ spring:
     show-sql: 'true'
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: ENC(YuMbhPg+BtuamD/WakXs1JdyiDz2azB+)
-    username: ENC(0/ClBytndOL4Ju9mE3paCA==)
+    password:
+    username: admin
     url: jdbc:mysql://database-1.c9l2rqqpo7fr.ap-northeast-2.rds.amazonaws.com:3306/miniproject?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
   servlet:
     multipart:
@@ -43,14 +43,14 @@ spring:
 cloud:
   aws:
     s3:
-      bucket: hanghae14-miniproject-6
+      bucket:
     stack:
       auto-: 'false'
     region:
       static: ap-northeast-2
     credentials:
-      accessKey: ENC(+knn7K80pgLIEHksECvTAMCwuw0Izp//A2/xj3f1ZpY=)
-      secretKey: ENC(fehfhrpYc+Oo7wHE1lovGjDB1BnPsXqyST3aJaHDPwk1Hb5if8ur6t2h1x+U1it9RMMssmCP52Q=)
+      accessKey:
+      secretKey:
 logging:
   level:
     jdbc:
