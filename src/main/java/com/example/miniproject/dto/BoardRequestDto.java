@@ -9,7 +9,7 @@ public class BoardRequestDto {
 
     private MultipartFile image;
 
-    private int star;
+    private Integer star;
 
     private String location;
 
