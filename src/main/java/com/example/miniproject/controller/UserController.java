@@ -18,17 +18,19 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/api/user/login")
+
+    @PostMapping("/login")
     public ResponseEntity<MsgAndHttpStatusDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("로그인 성공", HttpStatus.OK.value()));
     }
 
-    @GetMapping("/api/user/logout/")
+    @GetMapping("/logout/")
     public ResponseEntity<MsgAndHttpStatusDto> logout(HttpServletRequest request) {
 
         userService.logout(request);
@@ -36,20 +38,20 @@ public class UserController {
     }
 
     //아이디 중복확인
-    @GetMapping("/api/user/signup/id")
-    public ResponseEntity<MsgAndHttpStatusDto> checkId (@Valid @RequestParam String userId) {
-        userService.checkId(userId);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.",HttpStatus.OK.value()));
-    }
+//    @GetMapping("/api/user/signup/id")
+//    public ResponseEntity<MsgAndHttpStatusDto> checkId (@Valid @RequestParam String userId) {
+//        userService.checkId(userId);
+//        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.",HttpStatus.OK.value()));
+//    }
 
     //회원가입
-    @PostMapping("/api/user/signup")
+    @PostMapping("/signup")
     public ResponseEntity<MsgAndHttpStatusDto> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
         return ResponseEntity.ok(new MsgAndHttpStatusDto("회원가입 성공", HttpStatus.OK.value()));
     }
 
-    @GetMapping("/user/kakaologin/{jwt}")
+    @GetMapping("/kakaologin/{jwt}")
     public ResponseEntity<?> login_success(@PathVariable String jwt, HttpServletResponse response) throws Exception {
 
         System.out.println("카카오 로그인 성공 컨트롤러 진입");

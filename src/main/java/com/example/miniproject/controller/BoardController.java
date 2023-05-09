@@ -25,7 +25,8 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping(value = "/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BoardResponseDto> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
+
+    public ResponseEntity<?> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
         return boardService.createBoard(boardRequestDto, userDetails);
     }
 
