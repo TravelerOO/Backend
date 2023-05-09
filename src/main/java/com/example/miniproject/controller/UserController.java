@@ -52,11 +52,8 @@ public class UserController {
     public ResponseEntity<?> login_success(@PathVariable String jwt, HttpServletResponse response) throws Exception {
 
         System.out.println("카카오 로그인 성공 컨트롤러 진입");
-
         // 로그인 시도
-
         response.addHeader("Authorization", "Bearer " + jwt);
-
 
         return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
 

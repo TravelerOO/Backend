@@ -44,51 +44,10 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public ResponseEntity<List<BoardResponseDto>> getBoarsWithFilter(FilterRequestDto filterRequestDto) {
-        List<Board> boardList = null;
-
-        if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() == null & filterRequestDto.getKeyword() == null) { // keyword : x, location : x, star : x
-            boardList = boardRepository.findAllBySeasonOrderByCreatedAtDesc(filterRequestDto.getSeason());
-        } else { // 2. 그 외 필터 조건들 있을 경우 조건 모두 반영
-            if (filterRequestDto.getKeyword() != null) {
-                if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() == null) { // keyword : o, location : x, star : x
-                    boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                } else if (filterRequestDto.getLocation() != null && filterRequestDto.getStar() == null) { // keyword : o, location : o, star : x
-                    boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                } else if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() != null) { // // keyword : o, location : x, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndContainingKeywordOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getKeyword());
-                    }
-                } else { // keyword : o, location : o, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndLocationAndContainingKeywordOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation(), filterRequestDto.getKeyword());
-                    }
-                }
-            } else {
-                if (filterRequestDto.getLocation() != null && filterRequestDto.getStar() == null) { // keyword : x, location : o, star : x
-                    boardList = boardRepository.findAllBySeasonAndLocationOrderByCreatedAtDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                } else if (filterRequestDto.getLocation() == null && filterRequestDto.getStar() != null) { // keyword : x, location : x, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonOrderByStar(filterRequestDto.getSeason());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonOrderByStarDesc(filterRequestDto.getSeason());
-                    }
-                } else { // keyword : x, location : o, star : o
-                    if (filterRequestDto.getStar().equals("asc")) {
-                        boardList = boardRepository.findAllBySeasonAndLocationOrderByStar(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                    } else {
-                        boardList = boardRepository.findAllBySeasonAndLocationOrderByStarDesc(filterRequestDto.getSeason(), filterRequestDto.getLocation());
-                    }
-                }
-            }
-        }
+        List<Board> boardList = boardRepository.search(filterRequestDto);
         List<BoardResponseDto> boardResponseDtoList = boardList.stream().map(BoardResponseDto::new).toList();
         return ResponseEntity.ok(boardResponseDtoList);
     }
-
     @Transactional
     public ResponseEntity<MsgAndHttpStatusDto> deleteBoard(Long boardId, UserDetailsImp userDetails) {
         Board board = boardRepository.findById(boardId).orElseThrow(

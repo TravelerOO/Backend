@@ -62,17 +62,6 @@ dependencies {
 	// redis 사용
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	// jasypt 암호화 사용
-
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
-
-
-
-
-}
-
-bootJar {
-	duplicatesStrategy = "exclude"
 }
 
 tasks.named('test') {
