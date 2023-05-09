@@ -2,6 +2,7 @@ package com.example.miniproject.config;
 
 import com.example.miniproject.config.jwt.JwtAuthenticationFilter;
 import com.example.miniproject.config.jwt.JwtUtil;
+import com.example.miniproject.config.oauth.CustomAuthenticationFailureHandler;
 import com.example.miniproject.config.oauth.OAuth2AuthenticationSuccessHandler;
 import com.example.miniproject.config.oauth.UserOAuth2Service;
 import com.example.miniproject.config.security.CustomAuthenticationEntryPoint;
@@ -19,8 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.Filter;
-
 @Configuration
 @EnableWebSecurity // 스프링 Security 지원을 가능하게 함
 @RequiredArgsConstructor
@@ -28,18 +27,21 @@ import javax.servlet.Filter;
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/user/**",
+            "/api/user/**",
             "/member/authenticate",
             "/auth/**",
             "/oauth2/authorization/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/board/list"
+            "/api/boards",
+            "/api/board"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -72,8 +74,12 @@ public class WebSecurityConfig {
 //                .userInfoEndpoint()
 //                .userService(userOAuth2Service); // 로그인이 성공하면 해당 유저의 정보를 들고 userOAuth2Service에서 후처리를 해주겠다는의미.
 
+
         // 401 에러 핸들링
         http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
+
+        http.formLogin()
+                .failureHandler(customAuthenticationFailureHandler);
 
         return http.build();
     }

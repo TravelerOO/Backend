@@ -1,7 +1,6 @@
 package com.example.miniproject.config.jwt;
 
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
-import com.example.miniproject.dto.http.DefaultRes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,33 +28,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.resolveAccessToken(request);
         String refreshToken = jwtUtil.resolveRefreshToken(request);
 
+        if (refreshToken != null && accessToken != null) {
 
-        if (accessToken != null) {
-            if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
-                try {
-                    this.setAuthentication(jwtUtil.getUserInfoFromToken(accessToken).getSubject());
-                } catch (UsernameNotFoundException e){
-                    jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-                    return;
-                }
-            } else if (!jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey()) && refreshToken != null) {
-                boolean validateRefreshToken = jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey());
+            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
+                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
+                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
 
-                boolean isRefreshToken = jwtUtil.existsRefreshToken(refreshToken);
-                if (validateRefreshToken && isRefreshToken) {
-                    String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
-                    /// 토큰 발급
-                    String newAccessToken = jwtUtil.createAccessToken(userId);
-                    /// 헤더에 어세스 토큰 추가
-                    jwtUtil.setHeaderAccessToken(response, newAccessToken);
-                    /// 컨텍스트에 넣기
-                    try {
-                        this.setAuthentication(userId);
-                    } catch (UsernameNotFoundException e){
-                        jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
+                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
+                            /// 토큰 발급
+                            String newAccessToken = jwtUtil.createAccessToken(userId);
+                            /// 헤더에 어세스 토큰 추가
+                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
+                        }
+                        try {
+                            this.setAuthentication(userId);
+                        } catch (UsernameNotFoundException e) {
+                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                            return;
+                        }
+                    } else {
+                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
                         return;
                     }
+                } else {
+                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    return;
                 }
+            } else {
+                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                return;
             }
         }
 
@@ -76,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String json = new ObjectMapper().writeValueAsString(DefaultRes.res(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
