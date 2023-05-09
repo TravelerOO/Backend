@@ -1,11 +1,13 @@
 package com.example.miniproject.service;
 
+import com.example.miniproject.dto.http.ResponseMessage;
+import com.example.miniproject.dto.http.StatusCode;
+import com.example.miniproject.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import javax.security.sasl.AuthenticationException;
 import java.time.Duration;
 
 @Service
@@ -28,7 +30,7 @@ public class RedisService {
         if(redisTemplate.delete(token)) {
             return;
         } else {
-            throw new IllegalArgumentException("알 수 없는 RefreshToken 에 대한 삭제 요청이 들어왔습니다.");
+            throw new CustomException(ResponseMessage.LOGOUT_FAIL, StatusCode.BAD_REQUEST);
         }
     }
 }
