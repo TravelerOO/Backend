@@ -6,6 +6,9 @@ import com.example.miniproject.dto.BoardRequestDto;
 import com.example.miniproject.dto.BoardResponseDto;
 import com.example.miniproject.dto.FilterRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
+import com.example.miniproject.dto.http.DefaultRes;
+import com.example.miniproject.dto.http.ResponseMessage;
+import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.service.BoardService;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +30,17 @@ public class BoardController {
     @PostMapping(value = "/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 
     public ResponseEntity<?> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
+
         return boardService.createBoard(boardRequestDto, userDetails);
     }
 
     @GetMapping("/boards")
-    public ResponseEntity<List<BoardResponseDto>> getBoardsWithFilter(@ModelAttribute FilterRequestDto filterRequestDto) {
+    public ResponseEntity<?> getBoardsWithFilter(@ModelAttribute FilterRequestDto filterRequestDto) {
         return boardService.getBoarsWithFilter(filterRequestDto);
     }
 
     @DeleteMapping("/boards/{boardId}")
-    public ResponseEntity<MsgAndHttpStatusDto> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
+    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.deleteBoard(boardId, userDetails);
     }
 }

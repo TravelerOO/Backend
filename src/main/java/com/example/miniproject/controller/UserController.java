@@ -3,6 +3,8 @@ package com.example.miniproject.controller;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
+import com.example.miniproject.dto.UserIdRequestDto;
+import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
@@ -24,31 +26,32 @@ public class UserController {
     private final UserService userService;
 
 
-    @PostMapping("/login")
-    public ResponseEntity<MsgAndHttpStatusDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    @PostMapping("/user/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("로그인 성공", HttpStatus.OK.value()));
+        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
     }
 
-    @GetMapping("/logout/")
-    public ResponseEntity<MsgAndHttpStatusDto> logout(HttpServletRequest request) {
 
+    @GetMapping("/user/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("로그아웃 완료!", HttpStatus.OK.value()));
+        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
     }
 
     //아이디 중복확인
-//    @GetMapping("/api/user/signup/id")
-//    public ResponseEntity<MsgAndHttpStatusDto> checkId (@Valid @RequestParam String userId) {
-//        userService.checkId(userId);
-//        return ResponseEntity.ok(new MsgAndHttpStatusDto("사용가능한 아이디 입니다.",HttpStatus.OK.value()));
-//    }
+
+    @PostMapping("/user/signup/id")
+    public ResponseEntity<?> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
+        userService.checkId(userIdRequestDto);
+        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.Available_ID));
+    }
 
     //회원가입
-    @PostMapping("/signup")
-    public ResponseEntity<MsgAndHttpStatusDto> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
+    @PostMapping("/user/signup")
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.ok(new MsgAndHttpStatusDto("회원가입 성공", HttpStatus.OK.value()));
+        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.CREATED_USER));
     }
 
     @GetMapping("/kakaologin/{jwt}")
@@ -59,7 +62,6 @@ public class UserController {
         response.addHeader("Authorization", "Bearer " + jwt);
 
         return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
-
 
     }
 }
