@@ -69,7 +69,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	//jasypt 암호화
-	implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+
 
 	// queryDsl 사용
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -98,13 +101,6 @@ sourceSets {
 
 bootJar {
 
-//	doFirst {
-//		def jasyptPropertiesFile = file("${rootDir}/jasypt.properties")
-//		if (jasyptPropertiesFile.exists()) {
-//			jvmArguments = ["--jasypt.encryptor.password=${jasyptPropertiesFile.text.trim()}"]
-//		} else {
-//			throw new IllegalStateException("jasypt.properties 파일이 존재하지 않습니다.")
-//		}
-//	}
 	duplicatesStrategy 'exclude'
 }
+
