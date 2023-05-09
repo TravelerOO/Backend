@@ -24,12 +24,12 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/board", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createBoard(@ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) throws IOException {
         return boardService.createBoard(boardRequestDto, userDetails);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/boards")
     public ResponseEntity<List<BoardResponseDto>> getBoardsWithFilter(@ModelAttribute FilterRequestDto filterRequestDto) {
         return boardService.getBoarsWithFilter(filterRequestDto);
     }
