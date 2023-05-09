@@ -5,6 +5,8 @@ import com.example.miniproject.dto.BoardRequestDto;
 import com.example.miniproject.dto.BoardResponseDto;
 import com.example.miniproject.dto.FilterRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
+import com.example.miniproject.dto.http.DefaultDataRes;
+import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
 import com.example.miniproject.entity.Board;
@@ -44,8 +46,8 @@ public class BoardService {
             board.setUser(userDetailsImp.getUser());
             boardRepository.save(board);
             BoardResponseDto boardResponseDto = new BoardResponseDto(board);
-
-            return ResponseEntity.ok(boardResponseDto);
+            //수정
+            return ResponseEntity.ok(DefaultDataRes.dataRes(StatusCode.OK, ResponseMessage.BOARD_CREATE,boardResponseDto));
         } catch (IOException e) {
             throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
         }
@@ -55,10 +57,12 @@ public class BoardService {
     public ResponseEntity<List<BoardResponseDto>> getBoarsWithFilter(FilterRequestDto filterRequestDto) {
         List<Board> boardList = boardRepository.search(filterRequestDto);
         List<BoardResponseDto> boardResponseDtoList = boardList.stream().map(BoardResponseDto::new).toList();
-        return ResponseEntity.ok(boardResponseDtoList);
+        //수정
+        return ResponseEntity.ok(DefaultDataRes.dataRes(StatusCode.OK, ResponseMessage.BOARD_CREATE,boardResponseDtoList));
     }
+  
     @Transactional
-    public ResponseEntity<MsgAndHttpStatusDto> deleteBoard(Long boardId, UserDetailsImp userDetails) {
+    public ResponseEntity<?> deleteBoard(Long boardId, UserDetailsImp userDetails) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.BAD_REQUEST)
         );
@@ -70,7 +74,7 @@ public class BoardService {
         String imgPath = board.getImage();
         if (s3Uploader.delete(imgPath)) { // S3 에서 이미지 파일 삭제가 성공하면 DB에 있는 게시글도 삭제
             boardRepository.delete(board);
-            return ResponseEntity.ok(new MsgAndHttpStatusDto("삭제 완료!", HttpStatus.OK.value()));
+            return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.BOARD_DELETE));
         }
 
         throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.INTERNAL_SERVER_ERROR);

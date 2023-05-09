@@ -1,5 +1,6 @@
 package com.example.miniproject.exception;
 
+import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.StatusCode;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class ExceptionAdvisor {
 
     // 아이디, 비밀번호 유효성 검사 시 에러
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<Object> handleValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         Map<String, String> errorMap = new HashMap<>();
         if (bindingResult.hasErrors()) {
@@ -38,6 +39,6 @@ public class ExceptionAdvisor {
                 errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
         }
-        return ResponseEntity.badRequest().body(DefaultRes.res(StatusCode.BAD_REQUEST, "", errorMap));
+        return ResponseEntity.badRequest().body(DefaultDataRes.dataRes(StatusCode.BAD_REQUEST, null, errorMap));
     }
 }
