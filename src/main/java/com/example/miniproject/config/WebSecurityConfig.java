@@ -33,8 +33,8 @@ public class WebSecurityConfig {
             "/oauth2/authorization/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api/boards",
-            "/api/board"
+            "/api/boards"
+//            "/api/board"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;

@@ -5,8 +5,10 @@ import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
+import com.example.miniproject.entity.RefreshToken;
 import com.example.miniproject.entity.User;
 import com.example.miniproject.exception.CustomException;
+import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final TokenRepository tokenRepository;
     private final RedisService redisService;
 
     @Transactional
@@ -47,6 +49,8 @@ public class UserService {
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
         redisService.setValues(refreshToken, user.getUserId());
+        RefreshToken refreshTokenEntity = new RefreshToken(refreshToken.substring(7));
+        tokenRepository.save(refreshTokenEntity);
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
         response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
@@ -64,6 +68,7 @@ public class UserService {
     public void logout(HttpServletRequest request) {
         if (request.getHeader(JwtUtil.REFRESHTOKEN_HEADER) != null && redisService.getValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER)) != null) {
             redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
+            tokenRepository.deleteByRefreshToken(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER).substring(7));
         }
         throw new CustomException(ResponseMessage.WRONG_ACCESS, StatusCode.BAD_REQUEST);
     }
