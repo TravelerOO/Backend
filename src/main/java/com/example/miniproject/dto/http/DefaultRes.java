@@ -15,9 +15,9 @@ public class DefaultRes<T> {
         this.responseMessage = responseMessage;
     }
 
-    public static <T> DefaultRes<T> res(final int statusCode, final String responseMessage) {
-        return res(statusCode, responseMessage);
-    }
+//    public static <T> DefaultRes<T> res(final int statusCode, final String responseMessage) {
+//        return res(statusCode, responseMessage);
+//    }
 
 }
 
