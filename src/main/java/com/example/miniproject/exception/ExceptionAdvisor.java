@@ -22,7 +22,7 @@ public class ExceptionAdvisor {
     @ExceptionHandler(value = {IllegalArgumentException.class,
                                NullPointerException.class,
                                IllegalStateException.class,
-                               UsernameNotFoundException.class})
+                               })
     public ResponseEntity<Object> handleIllegalArgumentException(Exception ex) {
         String errorMsg = ex.getMessage();
 
