@@ -28,7 +28,7 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<?> createBoard(BoardRequestDto boardRequestDto, UserDetailsImp userDetailsImp) throws IOException {
-        // S3 에 이미지 저장(MultiPartFile 이 거치는 임시 저장 경로에서 tmp 파일이 삭제 안 되는 상황, S3및 DB 저장은 성공)
+        // S3 에 이미지 저장(MultiPartFile 이 거치는 임시 저장 경로에서 tmp 파일이 삭제 안 되는 상황, S3및 DB 저장은 성공) - 해결
         if (boardRequestDto.getImage() != null) {
             String imgPath = s3Uploader.upload(boardRequestDto.getImage());
             Board board = new Board(boardRequestDto, imgPath);
