@@ -20,7 +20,7 @@ jobs:
         with:
           ref: main
       - run: touch ./src/main/resources/application.properties
-      - run: echo "${{ AWS_PROPERTIES }}" > ./src/main/resources/application.properties
+      - run: echo "${{ secrets.AWS_PROPERTIES }}" > ./src/main/resources/application.properties
       - run: cat ./src/main/resources/application.properties
 
       - name: JDK 17 설치
