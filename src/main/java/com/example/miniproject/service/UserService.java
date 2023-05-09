@@ -68,13 +68,12 @@ public class UserService {
         String userId = signupRequestDto.getUserId();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-        String name = signupRequestDto.getName();
 
         Optional<User> found = userRepository.findByUserId(userId);
         if(userRepository.existsByUserId(userId)){
             throw new IllegalStateException("아이디 중복확인을 해주세요.");
         }
-        User user = new User(userId,password,nickname,name);
+        User user = new User(userId,password,nickname);
         userRepository.save(user);
     }
 }

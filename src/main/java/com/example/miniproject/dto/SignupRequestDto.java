@@ -22,6 +22,5 @@ public class SignupRequestDto {
 
     private String password;
     private String nickname;
-    private String name;
 
 }
