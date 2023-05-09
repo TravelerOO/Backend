@@ -27,13 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/user/**",
+            "/api/user/**",
             "/member/authenticate",
             "/auth/**",
             "/oauth2/authorization/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/board/list"
+            "/api/boards",
+            "/api/board"
     };
     private final JwtUtil jwtUtil;
     private final UserOAuth2Service userOAuth2Service;
