@@ -2,13 +2,13 @@ package com.example.miniproject.config.jwt;
 
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,23 +25,84 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String token = jwtUtil.resolveToken(request);
+        String accessToken = jwtUtil.resolveAccessToken(request);
+        String refreshToken = jwtUtil.resolveRefreshToken(request);
 
-        if (token != null) {
-            if (!jwtUtil.validateToken(token)) {
-                jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
+//        if (refreshToken != null && accessToken != null) {
+//            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
+//                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
+//                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
+//
+//                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
+//                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
+//                            /// 토큰 발급
+//                            String newAccessToken = jwtUtil.createAccessToken(userId);
+//                            /// 헤더에 어세스 토큰 추가
+//                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
+//                        }
+//                        try {
+//                            this.setAuthentication(userId);
+//                        } catch (UsernameNotFoundException e) {
+//                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+//                            return;
+//                        }
+//                    } else {
+//                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                        return;
+//                    }
+//                } else {
+//                    System.out.println("1번");
+//                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                    return;
+//                }
+//            } else { // 여기서 걸림
+//                System.out.println("2번");
+//                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+//                return;
+//            }
+//        }
+
+        if (refreshToken != null && accessToken != null) {
+            System.out.println(refreshToken);
+            System.out.println(jwtUtil.existsRefreshToken(refreshToken));
+            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
+                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
+                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
+
+                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
+                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
+                            /// 토큰 발급
+                            String newAccessToken = jwtUtil.createAccessToken(userId);
+                            /// 헤더에 어세스 토큰 추가
+                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
+                        }
+                        try {
+                            this.setAuthentication(userId);
+                        } catch (UsernameNotFoundException e) {
+                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
+                            return;
+                        }
+                    } else {
+                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                        return;
+                    }
+                } else {
+                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    return;
+                }
+            } else {
+                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
                 return;
             }
-            Claims info = jwtUtil.getUserInfoFromToken(token);
-            setAuthentication(info.getSubject());
 
         }
         filterChain.doFilter(request, response);
+
     }
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String userId) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(username);
+        Authentication authentication = jwtUtil.createAuthentication(userId);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
@@ -50,6 +111,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
         response.setStatus(statusCode);
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         try {
             String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
             response.getWriter().write(json);
