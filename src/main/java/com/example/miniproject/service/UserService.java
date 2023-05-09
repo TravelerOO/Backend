@@ -5,7 +5,6 @@ import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.entity.User;
-import com.example.miniproject.repository.TokenRepository;
 import com.example.miniproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +37,7 @@ public class UserService {
         System.out.println(user.getPassword());
 
         System.out.println(passwordEncoder.encode(password));
-        if (!passwordEncoder.matches(password,user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -53,32 +52,41 @@ public class UserService {
 
     //아이디 중복확인
     @Transactional
-    public void checkId(UserIdRequestDto userIdRequestDto){
+    public void checkId(UserIdRequestDto userIdRequestDto) {
         String userId = userIdRequestDto.getUserId();
 
-        if(userRepository.existsByUserId(userId)){
+        if (userRepository.existsByUserId(userId)) {
             throw new IllegalStateException("이미 아이디가 존재합니다.");
         }
     }
 
     @Transactional
     public void logout(HttpServletRequest request) {
-        redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
+        if (request.getHeader(JwtUtil.REFRESHTOKEN_HEADER) == null) {
+            throw new IllegalStateException("잘못된 접근입니다");
+        }
+
+        if (redisService.getValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER)) != null) {
+            redisService.deleteValues(request.getHeader(JwtUtil.REFRESHTOKEN_HEADER));
+        } else {
+            throw new IllegalStateException("잘못된 접근입니다");
+        }
+
     }
 
     //회원가입
     @Transactional
-    public void signup(SignupRequestDto signupRequestDto){
+    public void signup(SignupRequestDto signupRequestDto) {
         String userId = signupRequestDto.getUserId();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
         String name = signupRequestDto.getName();
 
         Optional<User> found = userRepository.findByUserId(userId);
-        if(userRepository.existsByUserId(userId)){
+        if (userRepository.existsByUserId(userId)) {
             throw new IllegalStateException("아이디 중복확인을 해주세요.");
         }
-        User user = new User(userId,password,nickname,name);
+        User user = new User(userId, password, nickname, name);
         userRepository.save(user);
     }
 }
