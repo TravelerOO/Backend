@@ -3,7 +3,6 @@ package com.example.miniproject.controller;
 import com.example.miniproject.dto.LoginRequestDto;
 import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.example.miniproject.dto.SignupRequestDto;
-import com.example.miniproject.dto.UserIdRequestDto;
 import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
@@ -40,12 +39,6 @@ public class UserController {
     }
 
     //아이디 중복확인
-
-    @PostMapping("/user/signup/id")
-    public ResponseEntity<?> checkId(@Valid @RequestBody UserIdRequestDto userIdRequestDto) {
-        userService.checkId(userIdRequestDto);
-        return ResponseEntity.ok(DefaultRes.res(StatusCode.OK, ResponseMessage.Available_ID));
-    }
 
     //회원가입
     @PostMapping("/user/signup")

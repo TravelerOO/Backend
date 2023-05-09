@@ -1,3 +1,9 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.11'
@@ -62,8 +68,39 @@ dependencies {
 	// redis 사용
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	//jasypt 암호화
+	implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
+
+	// queryDsl 사용
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor(
+			"javax.persistence:javax.persistence-api",
+			"javax.annotation:javax.annotation-api",
+			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+		}
+	}
+}
+
+bootJar {
+
+	doFirst {
+		def jasyptPropertiesFile = file("${rootDir}/jasypt.properties")
+		if (jasyptPropertiesFile.exists()) {
+			jvmArguments = ["--jasypt.encryptor.password=${jasyptPropertiesFile.text.trim()}"]
+		} else {
+			throw new IllegalStateException("jasypt.properties 파일이 존재하지 않습니다.")
+		}
+	}
+	duplicatesStrategy 'exclude'
 }
