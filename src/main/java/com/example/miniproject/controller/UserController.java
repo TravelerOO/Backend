@@ -1,7 +1,10 @@
 package com.example.miniproject.controller;
 
+import com.example.miniproject.dto.BoardResponseDto;
 import com.example.miniproject.dto.LoginRequestDto;
+import com.example.miniproject.dto.LoginResponseDto;
 import com.example.miniproject.dto.SignupRequestDto;
+import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
@@ -24,8 +27,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        userService.login(loginRequestDto, response);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        LoginResponseDto loginResponseDto = userService.login(loginRequestDto,response);
+        return ResponseEntity.ok(new DefaultDataRes<LoginResponseDto>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS, loginResponseDto));
     }
 
 
