@@ -25,7 +25,7 @@ public class ExceptionAdvisor {
         String msg = ex.getMsg();
         int statusCode = ex.getStatusCode();
 
-        return ResponseEntity.badRequest().body(new DefaultRes<>(statusCode, msg));
+        return ResponseEntity.status(statusCode).body(new DefaultRes<>(msg));
     }
 
     // 아이디, 비밀번호 유효성 검사 시 에러
@@ -38,8 +38,7 @@ public class ExceptionAdvisor {
                 errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
         }
-
-        return ResponseEntity.status(400).body(new DefaultDataRes<Map<String, String>>(StatusCode.BAD_REQUEST, null, errorMap));
+        return ResponseEntity.badRequest().body(new DefaultDataRes<Map<String, String>>(null, errorMap));
     }
 
     // 이미지 파일 미 업로드 시

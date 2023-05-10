@@ -3,7 +3,6 @@ buildscript {
 		queryDslVersion = "5.0.0"
 	}
 }
-
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.11'
@@ -38,6 +37,12 @@ dependencies {
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
+implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+annotationProcessor(
+		"javax.persistence:javax.persistence-api",
+		"javax.annotation:javax.annotation-api",
+		"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+
 
 	// Spring Security OAuth2
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -69,7 +74,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	//jasypt 암호화
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+	//implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
 
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 

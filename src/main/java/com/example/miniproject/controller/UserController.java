@@ -27,21 +27,21 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
         userService.login(loginRequestDto, response);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.LOGIN_SUCCESS));
     }
 
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.LOGOUT_SUCCESS));
     }
 
     //회원가입
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.status(500).body(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.CREATED_USER));
     }
 
     @GetMapping("/kakaologin/{jwt}")
@@ -50,6 +50,6 @@ public class UserController {
         System.out.println("카카오 로그인 성공 컨트롤러 진입");
         // 로그인 시도
         response.addHeader("Authorization", "Bearer " + jwt);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.LOGIN_SUCCESS));
     }
 }
