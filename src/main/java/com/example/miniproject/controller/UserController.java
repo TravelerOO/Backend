@@ -39,7 +39,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
+        return ResponseEntity.status(500).body(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
     }
 
     @GetMapping("/kakaologin/{jwt}")

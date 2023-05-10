@@ -25,7 +25,7 @@ public class BoardSearchImpl extends QuerydslRepositorySupport implements BoardS
             BooleanBuilder booleanBuilder = new BooleanBuilder();
             booleanBuilder.or(board.title.contains(filterRequestDto.getKeyword()));
             booleanBuilder.or(board.placename.contains(filterRequestDto.getKeyword()));
-            booleanBuilder.or(board.title.contains(filterRequestDto.getKeyword()));
+            booleanBuilder.or(board.content.contains(filterRequestDto.getKeyword()));
             query.where(booleanBuilder);
         }
 
