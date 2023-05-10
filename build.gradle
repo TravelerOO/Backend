@@ -74,7 +74,7 @@ annotationProcessor(
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	//jasypt 암호화
-	//implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+//	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
 
 	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
 

@@ -33,7 +33,7 @@ public class JwtUtil {
     public static final String REFRESHTOKEN_HEADER = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final long TOKEN_TIME = 3L; // 30분으로 설정 1800000L
+    private static final long TOKEN_TIME = 600000L; // 10분으로 설정 600000L
 
     private static final long REFRESH_TOKEN_TIME = 6 * 1800000L; // 3시간으로 설정 6 * 1800000L
 
