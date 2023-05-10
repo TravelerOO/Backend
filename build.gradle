@@ -68,6 +68,12 @@ dependencies {
 	// redis 사용
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	//jasypt 암호화
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+
+
 	// queryDsl 사용
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	annotationProcessor(
@@ -75,6 +81,10 @@ dependencies {
 			"javax.annotation:javax.annotation-api",
 			"com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 
+}
+
+jar {
+    enabled = false
 }
 
 tasks.named('test') {
@@ -90,5 +100,7 @@ sourceSets {
 }
 
 bootJar {
+
 	duplicatesStrategy 'exclude'
 }
+
