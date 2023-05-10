@@ -42,7 +42,7 @@ public class BoardService {
             boardRepository.save(board);
             BoardResponseDto boardResponseDto = new BoardResponseDto(board);
             //수정
-            return ResponseEntity.ok(new DefaultDataRes<BoardResponseDto>(StatusCode.OK, ResponseMessage.BOARD_CREATE, boardResponseDto));
+            return ResponseEntity.ok(new DefaultDataRes<BoardResponseDto>(ResponseMessage.BOARD_CREATE, boardResponseDto));
         } catch (IOException e) {
             throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
         }
@@ -53,7 +53,7 @@ public class BoardService {
         List<Board> boardList = boardRepository.search(filterRequestDto);
         List<BoardResponseDto> boardResponseDtoList = boardList.stream().map(BoardResponseDto::new).toList();
         //수정
-        return ResponseEntity.ok(new DefaultDataRes<List<BoardResponseDto>>(StatusCode.OK, ResponseMessage.BOARD_GET, boardResponseDtoList));
+        return ResponseEntity.ok(new DefaultDataRes<List<BoardResponseDto>>(ResponseMessage.BOARD_GET, boardResponseDtoList));
     }
   
     @Transactional
@@ -69,7 +69,7 @@ public class BoardService {
         String imgPath = board.getImage();
         if (s3Uploader.delete(imgPath)) { // S3 에서 이미지 파일 삭제가 성공하면 DB에 있는 게시글도 삭제
             boardRepository.delete(board);
-            return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.BOARD_DELETE));
+            return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.BOARD_DELETE));
         }
 
         throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.INTERNAL_SERVER_ERROR);

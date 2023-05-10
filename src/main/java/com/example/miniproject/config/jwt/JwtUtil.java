@@ -1,7 +1,7 @@
 package com.example.miniproject.config.jwt;
 
 import com.example.miniproject.config.security.UserDetailsServiceImpl;
-import com.example.miniproject.repository.TokenRepository;
+import com.example.miniproject.service.RedisService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -28,14 +28,14 @@ import java.util.Date;
 public class JwtUtil {
 
     private final UserDetailsServiceImpl userDetailsService;
-    private final TokenRepository tokenRepository;
+    private final RedisService redisService;
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String REFRESHTOKEN_HEADER = "RefreshToken";
     public static final String AUTHORIZATION_KEY = "auth";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final long TOKEN_TIME = 1800000L; // 30분으로 설정
+    private static final long TOKEN_TIME = 600000L; // 10분으로 설정 600000L
 
-    private static final long REFRESH_TOKEN_TIME =6*1800000L; // 3시간으로 설정
+    private static final long REFRESH_TOKEN_TIME = 6 * 1800000L; // 3시간으로 설정 6 * 1800000L
 
     @Value("${jwt.secret.access-key}")
     private String accessSecretKey;
@@ -101,13 +101,13 @@ public class JwtUtil {
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-
-            log.info("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
             log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT token, 만료된 JWT token 입니다.");
+            return true;
         }
         return false;
     }
@@ -124,11 +124,11 @@ public class JwtUtil {
 
     // RefreshToken 존재유무 확인
     public boolean existsRefreshToken(String refreshToken) {
-        return tokenRepository.existsByRefreshToken(refreshToken);
+        return redisService.getValues(refreshToken) != null;
     }
 
-    public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(token).getBody();
+    public Claims getUserInfoFromToken(Key key, String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
     public Authentication createAuthentication(String userId) {
@@ -136,11 +136,16 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-    public Long getExpiration(Key key, String token) {
-        // accessToken 남은 유효시간
-        Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getExpiration();
-        // 현재 시간
-        Long now = new Date().getTime();
-        return (expiration.getTime() - now);
+    public boolean isExpired(Key key, String token) {
+        try {
+            // accessToken 남은 유효시간
+            Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getExpiration();
+            // 현재 시간
+            Long now = new Date().getTime();
+            return (expiration.getTime() - now) > 0 ? false : true;
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+
     }
 }

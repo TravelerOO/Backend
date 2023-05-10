@@ -4,6 +4,8 @@ import java.util.Map;
 
 
 import com.example.miniproject.config.jwt.JwtUtil;
+import com.example.miniproject.service.RedisService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -14,10 +16,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@RequiredArgsConstructor
+
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    @Autowired
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+
+    private final RedisService redisService;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -34,9 +40,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String nickname = (String) properties.get("nickname");
 
         // jwt 토큰 발급
-        String jwt = jwtUtil.createAccessToken(nickname);
+        String accessToken = jwtUtil.createAccessToken(nickname);
+        String refreshToken = jwtUtil.createRefreshToken(nickname);
 
-        String url = makeRedirectUrl(jwt);
+        String redisKey = refreshToken.substring(7);
+        redisService.setValues(redisKey, nickname);
+
+        String url = makeRedirectUrl(accessToken, refreshToken);
         System.out.println("url: " + url);
 
         if (response.isCommitted()) {
@@ -47,11 +57,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     // 로그인 성공후에 redirecturl
-    private String makeRedirectUrl(String token) {
+    private String makeRedirectUrl(String token, String refreshToken) {
         System.out.println("함수호출");
 
 //        return UriComponentsBuilder.fromUriString("http://localhost:8080/main/"+token)
-        return UriComponentsBuilder.fromUriString("http://localhost:8080/user/kakaologin/" + token)
-                .build().toUriString();
+        return UriComponentsBuilder.fromUriString("http://localhost:8080/api/user/kakaologin")
+                .queryParam("token", token)
+                .queryParam("refreshToken", refreshToken)
+                .toUriString();
     }
 }

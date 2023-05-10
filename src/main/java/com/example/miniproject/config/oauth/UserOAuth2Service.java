@@ -61,8 +61,6 @@ public class UserOAuth2Service extends DefaultOAuth2UserService {
 
         Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
         String nickname = (String) properties.get("nickname");
-        
-
 
 
         /*
@@ -71,10 +69,12 @@ public class UserOAuth2Service extends DefaultOAuth2UserService {
         가입을 한 유저라면 로그인하기
          */
 
-        User user = new User(nickname);
 
         if(userRepository.findByUserId(nickname).isEmpty()){
-            System.out.println("추가 정보를 입력하여서 회원가입을 진행합니다. ");
+            System.out.println("카카오 서버에서 받아온 정보를 기반으로 회원가입을 진행합니다. ");
+
+            User user = new User(nickname, nickname);
+
             userRepository.save(user);
         }else {
             System.out.println("가입한적 있음.");

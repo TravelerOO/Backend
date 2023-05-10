@@ -21,7 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String json = new ObjectMapper().writeValueAsString(new DefaultRes<>(HttpStatus.UNAUTHORIZED.value(), "토큰이 유효하지 않습니다"));
+        String json = new ObjectMapper().writeValueAsString(new DefaultRes<>("토큰이 유효하지 않습니다."));
         response.getWriter().write(json);
     }
 }
