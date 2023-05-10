@@ -18,7 +18,7 @@ public class RedisService {
 
     public void setValues(String token, String userId) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(token, userId);
+        values.set(token, userId, Duration.ofMinutes(30L));
     }
 
     public String getValues(String token) {
@@ -27,6 +27,7 @@ public class RedisService {
     }
 
     public void deleteValues(String token) {
+        System.out.println(token);
         if(redisTemplate.delete(token)) {
             return;
         } else {

@@ -1,6 +1,5 @@
 package com.example.miniproject.config.jwt;
 
-import com.example.miniproject.dto.MsgAndHttpStatusDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,70 +27,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtUtil.resolveAccessToken(request);
         String refreshToken = jwtUtil.resolveRefreshToken(request);
 
-//        if (refreshToken != null && accessToken != null) {
-//            if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
-//                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
-//                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
-//
-//                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
-//                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
-//                            /// 토큰 발급
-//                            String newAccessToken = jwtUtil.createAccessToken(userId);
-//                            /// 헤더에 어세스 토큰 추가
-//                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
-//                        }
-//                        try {
-//                            this.setAuthentication(userId);
-//                        } catch (UsernameNotFoundException e) {
-//                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-//                            return;
-//                        }
-//                    } else {
-//                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-//                        return;
-//                    }
-//                } else {
-//                    System.out.println("1번");
-//                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-//                    return;
-//                }
-//            } else { // 여기서 걸림
-//                System.out.println("2번");
-//                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
-//                return;
-//            }
-//        }
-
         if (refreshToken != null && accessToken != null) {
-            System.out.println(refreshToken);
-            System.out.println(jwtUtil.existsRefreshToken(refreshToken));
             if (jwtUtil.existsRefreshToken(refreshToken) && jwtUtil.validateToken(refreshToken, jwtUtil.getRefreshKey())) {
-                if (jwtUtil.getExpiration(jwtUtil.getRefreshKey(), refreshToken) > 0) {
-                    if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
+                if (jwtUtil.validateToken(accessToken, jwtUtil.getAccessKey())) {
+                    String userId = jwtUtil.getUserInfoFromToken(jwtUtil.getRefreshKey(), refreshToken).getSubject();
+                    if (jwtUtil.isExpired(jwtUtil.getAccessKey(), accessToken)) { // 만료됏으면
+                        /// 토큰 발급
+                        String newAccessToken = jwtUtil.createAccessToken(userId);
+                        /// 헤더에 어세스 토큰 추가
+                        jwtUtil.setHeaderAccessToken(response, newAccessToken);
+                    }
 
-                        String userId = jwtUtil.getUserInfoFromToken(accessToken).getSubject();
-                        if (jwtUtil.getExpiration(jwtUtil.getAccessKey(), accessToken) < 0) {
-                            /// 토큰 발급
-                            String newAccessToken = jwtUtil.createAccessToken(userId);
-                            /// 헤더에 어세스 토큰 추가
-                            jwtUtil.setHeaderAccessToken(response, newAccessToken);
-                        }
-                        try {
-                            this.setAuthentication(userId);
-                        } catch (UsernameNotFoundException e) {
-                            jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
-                            return;
-                        }
-                    } else {
-                        jwtExceptionHandler(response, "유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    try {
+                        this.setAuthentication(userId);
+                    } catch (UsernameNotFoundException e) {
+                        jwtExceptionHandler(response, e.getMessage(), HttpStatus.UNAUTHORIZED.value());
                         return;
                     }
                 } else {
-                    jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                    jwtExceptionHandler(response, "유효하지 않은 액세스 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
                     return;
                 }
             } else {
-                jwtExceptionHandler(response, "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
+                jwtExceptionHandler(response, "유효하지 않은 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED.value());
                 return;
             }
 
@@ -113,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            String json = new ObjectMapper().writeValueAsString(new MsgAndHttpStatusDto(msg, statusCode));
+            String json = new ObjectMapper().writeValueAsString(msg);
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
