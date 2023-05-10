@@ -35,4 +35,14 @@ public class BoardController {
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.deleteBoard(boardId, userDetails);
     }
+
+    @GetMapping("/boards/{boardId}")
+    public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
+        return boardService.getBoard(boardId);
+    }
+
+    @PutMapping(value = "/boards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
+        return boardService.updateBoard(boardId, boardRequestDto, userDetails);
+    }
 }
