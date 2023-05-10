@@ -1,16 +1,14 @@
 #!/bin/bash
 
 ROOT_PATH="/home/ubuntu/spring-github-action"
+JAR="$ROOT_PATH/application-plain.jar"
 STOP_LOG="$ROOT_PATH/stop.log"
+SERVICE_PID=$(pgrep -f $JAR) # 실행중인 Spring 서버의 PID
 
-NOW=$(date +%c)
-
-echo "[$NOW] 이전에 실행 중인 서비스를 종료합니다." >> $STOP_LOG
-SERVICE_PIDS=$(pgrep -f "java -jar")
-for SERVICE_PID in $SERVICE_PIDS; do
-  SERVICE_JAR=$(readlink -f /proc/$SERVICE_PID/exe | cut -d' ' -f1-)
-  if [[ "$SERVICE_JAR" =~ .*\.jar$ ]]; then
-    kill $SERVICE_PID
-    echo "[$NOW] > 종료한 서비스: $SERVICE_JAR, PID: $SERVICE_PID" >> $STOP_LOG
-  fi
-done
+if [ -z "$SERVICE_PID" ]; then
+  echo "서비스 NouFound" >> $STOP_LOG
+else
+  echo "서비스 종료 " >> $STOP_LOG
+  kill "$SERVICE_PID"
+  # kill -9 $SERVICE_PID # 강제 종료를 하고 싶다면 이 명령어 사용
+fi
