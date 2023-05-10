@@ -58,9 +58,7 @@ public class BoardService {
   
     @Transactional
     public ResponseEntity<?> deleteBoard(Long boardId, UserDetailsImp userDetails) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.BAD_REQUEST)
-        );
+        Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_DELETE_FAIL);
 
         if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
             throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.BAD_REQUEST);
@@ -73,5 +71,41 @@ public class BoardService {
         }
 
         throw new CustomException(ResponseMessage.BOARD_DELETE_FAIL, StatusCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> getBoard(Long boardId) {
+        Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_GET_FAIL_ID);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(board);
+        return ResponseEntity.ok(new DefaultDataRes<>(ResponseMessage.BOARD_GET_ID, boardResponseDto));
+    }
+
+    @Transactional
+    public ResponseEntity<?> updateBoard(Long boardId, BoardRequestDto boardRequestDto, UserDetailsImp userDetails) {
+        Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_UPDATE_FAIL);
+
+        if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
+            throw new CustomException(ResponseMessage.BOARD_UPDATE_FAIL, StatusCode.BAD_REQUEST);
+        }
+
+        // 기존 이미지 삭제
+        String imgUrl = board.getImage();
+        s3Uploader.delete(imgUrl);
+
+        // 새로운 이미지로 저장
+        try { // upload method 에서 발생하는 IOException 을 Customize 하기 위해 try-catch 사용
+            String imgPath = s3Uploader.upload(boardRequestDto.getImage());
+            board.update(boardRequestDto, imgPath);
+            BoardResponseDto boardResponseDto = new BoardResponseDto(board);
+            return ResponseEntity.ok(new DefaultRes<BoardResponseDto>(ResponseMessage.BOARD_UPDATE));
+        } catch (IOException e) {
+            throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public Board findBoardOrElseThrow(Long boardId, String msg) {
+        return boardRepository.findById(boardId).orElseThrow(
+                () -> new CustomException(msg, StatusCode.BAD_REQUEST)
+        );
     }
 }
