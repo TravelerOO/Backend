@@ -2,6 +2,7 @@ package com.example.miniproject.controller;
 
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
+import com.example.miniproject.dto.LoginResponseDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.http.DefaultDataRes;
 
@@ -25,24 +26,26 @@ public class UserController {
     private final UserService userService;
 
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response) {
-        userService.login(loginRequestDto, response);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        LoginResponseDto loginResponseDto = userService.login(loginRequestDto, response);
+        return ResponseEntity.ok(new DefaultDataRes<>(ResponseMessage.LOGIN_SUCCESS, loginResponseDto));
     }
+
 
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGOUT_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.LOGOUT_SUCCESS));
     }
 
     //회원가입
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDto signUpRequestDto) {
         userService.signup(signUpRequestDto);
-        return ResponseEntity.status(500).body(new DefaultRes<>(StatusCode.OK, ResponseMessage.CREATED_USER));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.CREATED_USER));
     }
 
     @GetMapping("/kakaologin")
@@ -54,6 +57,7 @@ public class UserController {
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
         response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
 
-        return ResponseEntity.ok(new DefaultRes<>(StatusCode.OK, ResponseMessage.LOGIN_SUCCESS));
+        return ResponseEntity.ok(new DefaultRes<>(ResponseMessage.LOGIN_SUCCESS));
+
     }
 }

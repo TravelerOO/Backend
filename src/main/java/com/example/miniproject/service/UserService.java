@@ -2,6 +2,7 @@ package com.example.miniproject.service;
 
 import com.example.miniproject.config.jwt.JwtUtil;
 import com.example.miniproject.dto.LoginRequestDto;
+import com.example.miniproject.dto.LoginResponseDto;
 import com.example.miniproject.dto.SignupRequestDto;
 import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
@@ -28,15 +29,15 @@ public class UserService {
     private final RedisService redisService;
 
     @Transactional
-    public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String userId = loginRequestDto.getUserId();
         String password = loginRequestDto.getPassword();
 
         User user = userRepository.findByUserId(userId).orElseThrow(
-                () -> new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.UNAUTHORIZED));// 예외처리 해주기
+                () -> new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.BAD_REQUEST));// 예외처리 해주기
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.UNAUTHORIZED);
+            throw new CustomException(ResponseMessage.NOT_FOUND_USER, StatusCode.BAD_REQUEST);
         }
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
@@ -47,6 +48,8 @@ public class UserService {
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
         response.addHeader(JwtUtil.REFRESHTOKEN_HEADER, refreshToken);
+
+        return new LoginResponseDto(user.getNickname());
     }
 
     @Transactional(readOnly = true)
