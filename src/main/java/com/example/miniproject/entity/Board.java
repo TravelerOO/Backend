@@ -36,7 +36,7 @@ public class Board extends TimeStamped {
     @Column(nullable = false)
     private String season;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Board(BoardRequestDto boardRequestDto, String imgPath) {
