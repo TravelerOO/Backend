@@ -52,4 +52,14 @@ public class Board extends TimeStamped {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public void update(BoardRequestDto boardRequestDto, String imgPath) {
+        this.title = boardRequestDto.getTitle();
+        this.image = imgPath;
+        this.star = boardRequestDto.getStar();
+        this.location = boardRequestDto.getLocation();
+        this.placename = boardRequestDto.getPlacename();
+        this.content = boardRequestDto.getContent();
+        this.season = boardRequestDto.getSeason();
+    }
 }

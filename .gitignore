@@ -41,7 +41,7 @@ application.properties
 
 
 ### AWS ###
-application-aws.properties
+application.yml
 application-aws.yml
 
 ### jasypt.properties ###
