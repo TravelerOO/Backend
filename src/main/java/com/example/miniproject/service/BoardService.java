@@ -53,7 +53,7 @@ public class BoardService {
         List<Board> boardList = boardRepository.search(filterRequestDto);
         List<BoardResponseDto> boardResponseDtoList = boardList.stream().map(BoardResponseDto::new).toList();
         //수정
-        return ResponseEntity.ok(new DefaultDataRes<List<BoardResponseDto>>(StatusCode.OK, ResponseMessage.BOARD_CREATE,boardResponseDtoList));
+        return ResponseEntity.ok(new DefaultDataRes<List<BoardResponseDto>>(StatusCode.OK, ResponseMessage.BOARD_GET, boardResponseDtoList));
     }
   
     @Transactional

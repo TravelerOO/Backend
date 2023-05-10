@@ -73,8 +73,11 @@ annotationProcessor(
 	// redis 사용
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	// JASYPT 를 사용한 프로퍼티 암호화
-//	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
+	//jasypt 암호화
+	//implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
+
+	implementation 'org.bouncycastle:bcprov-jdk15on:1.69'
+
 
 	// queryDsl 사용
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
@@ -85,14 +88,24 @@ annotationProcessor(
 
 }
 
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
 
-	sourceSets {
-		main {
-			java {
-				srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
-			}
+sourceSets {
+	main {
+		java {
+			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
 		}
 	}
 }
+
+bootJar {
+
+	duplicatesStrategy 'exclude'
+}
+
