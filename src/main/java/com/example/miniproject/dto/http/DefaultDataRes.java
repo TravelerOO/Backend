@@ -14,8 +14,4 @@ public class DefaultDataRes<T> extends DefaultRes<T> {
         super(responseMessage);
         this.data = data;
     }
-
-//    public static <T> DefaultDataRes<T> dataRes(final int statusCode, final String responseMessage, T data) {
-//        return (DefaultDataRes<T>) dataRes(statusCode, responseMessage, data);
-//    }
 }

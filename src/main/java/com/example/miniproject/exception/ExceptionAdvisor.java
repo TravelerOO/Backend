@@ -2,6 +2,7 @@ package com.example.miniproject.exception;
 
 import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
+import com.example.miniproject.dto.http.ResponseMessage;
 import com.example.miniproject.dto.http.StatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -38,12 +39,12 @@ public class ExceptionAdvisor {
                 errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
         }
-        return ResponseEntity.badRequest().body(new DefaultDataRes<Map<String, String>>(null, errorMap));
+        return ResponseEntity.badRequest().body(new DefaultDataRes<Map<String, String>>(ResponseMessage.CREATED_USER_FAIL, errorMap));
     }
 
     // 이미지 파일 미 업로드 시
     @ExceptionHandler(value = {BindException.class})
     public ResponseEntity<?> handleBindException(BindException ex) {
-        return ResponseEntity.badRequest().body(new DefaultRes<>(StatusCode.BAD_REQUEST, "이미지 파일을 업로드해주세요"));
+        return ResponseEntity.badRequest().body(new DefaultRes<>(ResponseMessage.WRONG_FORMAT));
     }
 }
