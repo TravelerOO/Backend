@@ -10,8 +10,8 @@ public class DefaultDataRes<T> extends DefaultRes<T> {
     private T data;
 
 
-    public DefaultDataRes(int statusCode, String responseMessage, T data) {
-        super(statusCode, responseMessage);
+    public DefaultDataRes(String responseMessage, T data) {
+        super(responseMessage);
         this.data = data;
     }
 

@@ -86,7 +86,6 @@ public class UserService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        Optional<User> found = userRepository.findByUserId(userId);
         if (userRepository.existsByUserId(userId)) {
             throw new CustomException(ResponseMessage.ALREADY_ENROLLED_USER, StatusCode.ID_DUPLICATE);
         }
