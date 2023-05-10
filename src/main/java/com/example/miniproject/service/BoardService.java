@@ -74,8 +74,11 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getBoard(Long boardId) {
+    public ResponseEntity<?> getBoard(Long boardId, UserDetailsImp userDetails) {
         Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_GET_FAIL_ID);
+        if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
+            throw new CustomException(ResponseMessage.BOARD_UPDATE_FAIL, StatusCode.BAD_REQUEST);
+        }
         BoardResponseDto boardResponseDto = new BoardResponseDto(board);
         return ResponseEntity.ok(new DefaultDataRes<>(ResponseMessage.BOARD_GET_ID, boardResponseDto));
     }

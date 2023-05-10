@@ -37,8 +37,8 @@ public class BoardController {
     }
 
     @GetMapping("/boards/{boardId}")
-    public ResponseEntity<?> getBoard(@PathVariable Long boardId) {
-        return boardService.getBoard(boardId);
+    public ResponseEntity<?> getBoard(@PathVariable Long boardId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
+        return boardService.getBoard(boardId, userDetails);
     }
 
     @PutMapping(value = "/boards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
