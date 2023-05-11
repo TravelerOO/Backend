@@ -93,7 +93,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("https://frontend-travler.vercel.app:3000");
+        config.addAllowedOrigin("http://hanghae99.team6.travler.s3-website.ap-northeast-2.amazonaws.com");
         config.addExposedHeader(JwtUtil.AUTHORIZATION_HEADER);
         config.addExposedHeader(JwtUtil.REFRESHTOKEN_HEADER);
         config.addAllowedMethod("*");
