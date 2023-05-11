@@ -53,9 +53,8 @@ public class Board extends TimeStamped {
         this.user = user;
     }
 
-    public void update(BoardRequestDto boardRequestDto, String imgPath) {
+    public void update(BoardRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
-        this.image = imgPath;
         this.star = boardRequestDto.getStar();
         this.location = boardRequestDto.getLocation();
         this.placename = boardRequestDto.getPlacename();
