@@ -6,7 +6,7 @@
 <table>
   <tbody>
     <tr>
-      <td align="center"><a href="https://github.com/orgs/TravelerOO/people/seonminKim1122"><img src="https://avatars.githubusercontent.com/u/124031561?v=4" width="100px;" alt=""/><br /><sub><b>BE 리더 : 김선민</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/seonminKim1122"><img src="https://avatars.githubusercontent.com/u/124031561?v=4" width="100px;" alt=""/><br /><sub><b>BE 리더 : 김선민</b></sub></a><br /></td>
       <td align="center"><a href="https://github.com/bbakzi"><img src="https://avatars.githubusercontent.com/u/128371819?v=4" width="100px;" alt=""/><br /><sub><b>BE 팀원 : 박지훈</b></sub></a><br /></td>
         <td align="center"><a href="https://github.com/kkj5158"><img src="https://avatars.githubusercontent.com/u/40461588?v=4" width="100px;" alt=""/><br /><sub><b>BE 팀원 : 김지승</b></sub></a><br /></td>
         <td align="center"><a href="https://github.com/YEJINGO"><img src="https://avatars.githubusercontent.com/u/114003526?v=4" width="100px;" alt=""/><br /><sub><b>BE 팀원 : 고예진</b></sub></a><br /></td>
