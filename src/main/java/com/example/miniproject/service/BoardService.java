@@ -3,6 +3,7 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.security.UserDetailsImp;
 import com.example.miniproject.dto.BoardRequestDto;
 import com.example.miniproject.dto.BoardResponseDto;
+import com.example.miniproject.dto.BoardUpdateRequestDto;
 import com.example.miniproject.dto.FilterRequestDto;
 import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
@@ -84,7 +85,7 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<?> updateBoard(Long boardId, BoardRequestDto boardRequestDto, UserDetailsImp userDetails) {
+    public ResponseEntity<?> updateBoard(Long boardId, BoardUpdateRequestDto boardRequestDto, UserDetailsImp userDetails) {
         Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_UPDATE_FAIL);
 
         if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
