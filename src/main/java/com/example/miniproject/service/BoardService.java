@@ -91,19 +91,9 @@ public class BoardService {
             throw new CustomException(ResponseMessage.BOARD_UPDATE_FAIL, StatusCode.BAD_REQUEST);
         }
 
-        // 기존 이미지 삭제
-        String imgUrl = board.getImage();
-        s3Uploader.delete(imgUrl);
-
-        // 새로운 이미지로 저장
-        try { // upload method 에서 발생하는 IOException 을 Customize 하기 위해 try-catch 사용
-            String imgPath = s3Uploader.upload(boardRequestDto.getImage());
-            board.update(boardRequestDto, imgPath);
-            BoardResponseDto boardResponseDto = new BoardResponseDto(board);
-            return ResponseEntity.ok(new DefaultRes<BoardResponseDto>(ResponseMessage.BOARD_UPDATE));
-        } catch (IOException e) {
-            throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
-        }
+        board.update(boardRequestDto);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(board);
+        return ResponseEntity.ok(new DefaultRes<BoardResponseDto>(ResponseMessage.BOARD_UPDATE));
     }
 
     public Board findBoardOrElseThrow(Long boardId, String msg) {
