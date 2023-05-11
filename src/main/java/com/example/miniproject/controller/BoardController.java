@@ -3,6 +3,7 @@ package com.example.miniproject.controller;
 
 import com.example.miniproject.config.security.UserDetailsImp;
 import com.example.miniproject.dto.BoardRequestDto;
+import com.example.miniproject.dto.BoardUpdateRequestDto;
 import com.example.miniproject.dto.FilterRequestDto;
 import com.example.miniproject.service.BoardService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,8 +42,8 @@ public class BoardController {
         return boardService.getBoard(boardId, userDetails);
     }
 
-    @PutMapping(value = "/boards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @ModelAttribute BoardRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
+    @PutMapping(value = "/boards/{boardId}")
+    public ResponseEntity<?> updateBoard(@PathVariable Long boardId, @ModelAttribute BoardUpdateRequestDto boardRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImp userDetails) {
         return boardService.updateBoard(boardId, boardRequestDto, userDetails);
     }
 }
