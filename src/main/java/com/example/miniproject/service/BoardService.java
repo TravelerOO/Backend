@@ -3,6 +3,7 @@ package com.example.miniproject.service;
 import com.example.miniproject.config.security.UserDetailsImp;
 import com.example.miniproject.dto.BoardRequestDto;
 import com.example.miniproject.dto.BoardResponseDto;
+import com.example.miniproject.dto.BoardUpdateRequestDto;
 import com.example.miniproject.dto.FilterRequestDto;
 import com.example.miniproject.dto.http.DefaultDataRes;
 import com.example.miniproject.dto.http.DefaultRes;
@@ -84,26 +85,16 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<?> updateBoard(Long boardId, BoardRequestDto boardRequestDto, UserDetailsImp userDetails) {
+    public ResponseEntity<?> updateBoard(Long boardId, BoardUpdateRequestDto boardRequestDto, UserDetailsImp userDetails) {
         Board board = findBoardOrElseThrow(boardId, ResponseMessage.BOARD_UPDATE_FAIL);
 
         if (!board.getUser().getUserId().equals(userDetails.getUser().getUserId())) {
             throw new CustomException(ResponseMessage.BOARD_UPDATE_FAIL, StatusCode.BAD_REQUEST);
         }
 
-        // 기존 이미지 삭제
-        String imgUrl = board.getImage();
-        s3Uploader.delete(imgUrl);
-
-        // 새로운 이미지로 저장
-        try { // upload method 에서 발생하는 IOException 을 Customize 하기 위해 try-catch 사용
-            String imgPath = s3Uploader.upload(boardRequestDto.getImage());
-            board.update(boardRequestDto, imgPath);
-            BoardResponseDto boardResponseDto = new BoardResponseDto(board);
-            return ResponseEntity.ok(new DefaultRes<BoardResponseDto>(ResponseMessage.BOARD_UPDATE));
-        } catch (IOException e) {
-            throw new CustomException(ResponseMessage.S3_ERROR, StatusCode.INTERNAL_SERVER_ERROR);
-        }
+        board.update(boardRequestDto);
+        BoardResponseDto boardResponseDto = new BoardResponseDto(board);
+        return ResponseEntity.ok(new DefaultRes<BoardResponseDto>(ResponseMessage.BOARD_UPDATE));
     }
 
     public Board findBoardOrElseThrow(Long boardId, String msg) {

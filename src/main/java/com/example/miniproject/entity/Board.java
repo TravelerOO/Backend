@@ -1,6 +1,7 @@
 package com.example.miniproject.entity;
 
 import com.example.miniproject.dto.BoardRequestDto;
+import com.example.miniproject.dto.BoardUpdateRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -53,9 +54,8 @@ public class Board extends TimeStamped {
         this.user = user;
     }
 
-    public void update(BoardRequestDto boardRequestDto, String imgPath) {
+    public void update(BoardUpdateRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
-        this.image = imgPath;
         this.star = boardRequestDto.getStar();
         this.location = boardRequestDto.getLocation();
         this.placename = boardRequestDto.getPlacename();
